@@ -1609,8 +1609,8 @@ return true;
 	}
 	
 	if ($type=='campaign'){
-		
-if (!isset($data['as_values_1'])){$data['as_values_1']='';}
+            global  $maindb;
+            if (!isset($data['as_values_1'])){$data['as_values_1']='';}
 if (!isset($data['placement_select'])){$data['placement_select']='';}
 if (!isset($data['channel_select'])){$data['channel_select']='';}
 if (!isset($data['target_iphone'])){$data['target_iphone']='';}
@@ -1659,12 +1659,34 @@ $editdata=$data;
 return false;	
 }
 
-if ($data['device_targeting']==2 && ($data['target_iphone']!=1 && $data['target_ipod']!=1 && $data['target_ipad']!=1 && $data['target_android']!=1 && $data['target_other']!=1)){
+
+
+/*if ($data['device_targeting']==2 && ($data['target_iphone']!=1 && $data['target_ipod']!=1 && $data['target_ipad']!=1 && $data['target_android']!=1 && $data['target_other']!=1)){
 global $errormessage;
 $errormessage='Please select at least one device type you want to target.';
 global $editdata;
 $editdata=$data;
 return false;	
+}
+*/
+$targetDevices = array();
+// edit by nitesh
+if($data['device_targeting'] ==2){
+    if( !isset($data["device"]) || isset($data["device"]) && is_array($data["device"]) && count($data["device"]) == 0){
+        global $errormessage;
+        $errormessage='Please select at least one device type you want to target.';
+        global $editdata;
+        $editdata=$data;
+        return false;	
+    }else{
+        $targetDevices = $data["device"];
+    }
+}else if($data['device_targeting'] == 1){
+    $sql = "SELECT device_id FROM md_device";
+    $devices = mysql_query($sql,$maindb);
+    while($device = mysql_fetch_array($devices)){
+        $targetDevices[] = $device["device_id"];
+    }
 }
 
 if ($data['campaign_type']=='network' && (!is_numeric($data['campaign_networkid']))){
@@ -1701,7 +1723,28 @@ $editdata=$data;
 return false;	
 }
 
+if(empty($data["budget"])){
+    global $errormessage;
+    $errormessage='Invalid budget amount for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;	
+}
 
+if(empty($data["bid_pricing"])){
+    global $errormessage;
+    $errormessage='Choose Bidding price for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;	
+}
+if(empty($data["max_pricing"])){
+    global $errormessage;
+    $errormessage='Invalid Max CPC or Max CPM for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}
 if ($data['start_date_type']==2){
 $start_date=explode('/',$data['startdate_value']);
 $start_date_array['year']=$start_date[2];
@@ -1789,13 +1832,36 @@ $data['geo_targeting']=sanitize($data['geo_targeting']);
 $data['publication_targeting']=sanitize($data['publication_targeting']);
 $data['channel_targeting']=sanitize($data['channel_targeting']);
 $data['device_targeting']=sanitize($data['device_targeting']);
-
+$data["budget"] = sanitize($data["budget"]);
+$data["bid_pricing"] = sanitize($data["bid_pricing"]);
+$data["max_pricing"] = sanitize($data["max_pricing"]);
 
 global $maindb;
 
-mysql_query("UPDATE md_campaigns set campaign_type='$data[campaign_type]', campaign_name='$data[campaign_name]', campaign_desc='$data[campaign_desc]', campaign_start='$data[startdate_value]', campaign_end='$data[enddate_value]', campaign_networkid='$data[campaign_networkid]', campaign_priority='$data[campaign_priority]', target_iphone='$data[target_iphone]', target_ipod='$data[target_ipod]', target_ipad='$data[target_ipad]', target_android='$data[target_android]', target_other='$data[target_other]', ios_version_min='$data[ios_version_min]', ios_version_max='$data[ios_version_max]', android_version_min='$data[android_version_min]', android_version_max='$data[android_version_max]', country_target='$data[geo_targeting]', publication_target='$data[publication_targeting]', channel_target='$data[channel_targeting]', device_target='$data[device_targeting]' where campaign_id='$detail'", $maindb);
+mysql_query("UPDATE md_campaigns set campaign_type='$data[campaign_type]', campaign_name='$data[campaign_name]', campaign_desc='$data[campaign_desc]', campaign_start='$data[startdate_value]', campaign_end='$data[enddate_value]', campaign_networkid='$data[campaign_networkid]', campaign_priority='$data[campaign_priority]', target_iphone='$data[target_iphone]', target_ipod='$data[target_ipod]', target_ipad='$data[target_ipad]', target_android='$data[target_android]', target_other='$data[target_other]', ios_version_min='$data[ios_version_min]', ios_version_max='$data[ios_version_max]', android_version_min='$data[android_version_min]', android_version_max='$data[android_version_max]', country_target='$data[geo_targeting]', publication_target='$data[publication_targeting]', channel_target='$data[channel_targeting]', device_target='$data[device_targeting]' , budget='$data[budget]', bid_pricing='$data[bid_pricing]', max_pricing='$data[max_pricing]' where campaign_id='$detail'", $maindb);
 
 reset_campaign_targeting($detail);
+
+// delete old records from md_device_targeting
+$sql = "DELETE FROM md_device_targeting WHERE campaign_id = $detail";
+mysql_query($sql,$maindb);
+if(count($targetDevices) > 0){
+// Insert device to campaigns
+    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id) VALUES ";
+    $comma = "";
+    foreach($targetDevices as $td){
+        $sql .= $comma . "($detail,$td)";
+        $comma = ",";
+    }
+    //echo $sql;
+    mysql_query($sql, $maindb);
+}
+
+//update devices according to campaign
+/*if(count($targetDevices) > 0){
+    $device_ids = "'" . implode(",", $targetDevices) . "'";
+    mysql_query("UPDATE md_device_targeting SET device_id = $device_ids WHERE campaign_id = $detail",$maindb);
+}*/
 
 // Extra Targeting Variables
 
@@ -2520,10 +2586,9 @@ return true;
 	
 }
 		
-		if ($type=='campaign'){
-			
-//hitesh: targeting changes are required here
-if (!isset($data['as_values_1'])){$data['as_values_1']='';}
+if ($type=='campaign'){
+    global $maindb;
+    if (!isset($data['as_values_1'])){$data['as_values_1']='';}
 if (!isset($data['placement_select'])){$data['placement_select']='';}
 if (!isset($data['channel_select'])){$data['channel_select']='';}
 if (!isset($data['target_iphone'])){$data['target_iphone']='';}
@@ -2556,7 +2621,6 @@ $editdata=$data;
 return false;	
 }
 
-//hitesh: targeting. remove publication selection option. By default all publications
 if ($data['publication_targeting']==2 && count($data['placement_select'])<1){
 global $errormessage;
 $errormessage='Please select at least one placement you want to target.';
@@ -2572,13 +2636,33 @@ global $editdata;
 $editdata=$data;
 return false;	
 }
-
+/*
 if ($data['device_targeting']==2 && ($data['target_iphone']!=1 && $data['target_ipod']!=1 && $data['target_ipad']!=1 && $data['target_android']!=1 && $data['target_other']!=1)){
 global $errormessage;
 $errormessage='Please select at least one device type you want to target.';
 global $editdata;
 $editdata=$data;
 return false;	
+}
+*/
+$targetDevices = array();
+// edit by nitesh
+if($data['device_targeting'] ==2){
+    if( !isset($data["device"]) || isset($data["device"]) && is_array($data["device"]) && count($data["device"]) == 0){
+        global $errormessage;
+        $errormessage='Please select at least one device type you want to target.';
+        global $editdata;
+        $editdata=$data;
+        return false;	
+    }else{
+        $targetDevices = $data["device"];
+    }
+}else if($data['device_targeting'] == 1){
+    $sql = "SELECT device_id FROM md_device";
+    $devices = mysql_query($sql,$maindb);
+    while($device = mysql_fetch_array($devices)){
+        $targetDevices[] = $device["device_id"];
+    }
 }
 
 if ($data['campaign_type']=='network' && (!is_numeric($data['campaign_networkid']))){
@@ -2702,6 +2786,30 @@ global $editdata;
 $editdata=$data;
 return false;	
 }
+
+if(empty($data["budget"])){
+    global $errormessage;
+    $errormessage='Invalid budget amount for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;	
+}
+
+if(empty($data["bid_pricing"])){
+    global $errormessage;
+    $errormessage='Choose Bidding price for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;	
+}
+if(empty($data["max_pricing"])){
+    global $errormessage;
+    $errormessage='Invalid Max CPC or Max CPM for your campaign';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}
+
 
 // Define Image Sizes
 if ($data['creative_format']==1){$data['custom_creative_width']=320; $data['custom_creative_height']=50;}
@@ -2896,19 +3004,29 @@ $data['geo_targeting']=sanitize($data['geo_targeting']);
 $data['publication_targeting']=sanitize($data['publication_targeting']);
 $data['channel_targeting']=sanitize($data['channel_targeting']);
 $data['device_targeting']=sanitize($data['device_targeting']);
+$data["budget"] = sanitize($data["budget"]);
+$data["bid_pricing"] = sanitize($data["bid_pricing"]);
+$data["max_pricing"] = sanitize($data["max_pricing"]);
 
-//hitesh before doing this, following changes are needed:
-//update device targeting: add new devices
-//remove publication selection, by default all publications
-//enable user to put target price - CPC or CPM based
-//during setup update table to add more target devices 
 
 // Insert Campaign into DB
-mysql_query("INSERT INTO md_campaigns (campaign_owner, campaign_status, campaign_type, campaign_name, campaign_desc, campaign_start, campaign_end, campaign_creationdate, campaign_networkid, campaign_priority, target_iphone, target_ipod, target_ipad, target_android, target_other, ios_version_min, ios_version_max, android_version_min, android_version_max, country_target, publication_target, channel_target, device_target)
-VALUES ('$user_detail[user_id]', '1', '$data[campaign_type]', '$data[campaign_name]', '$data[campaign_desc]', '$data[startdate_value]', '$data[enddate_value]', '$creation_timestamp', '$data[campaign_networkid]', '$data[campaign_priority]', '$data[target_iphone]', '$data[target_ipod]', '$data[target_ipad]', '$data[target_android]', '$data[target_other]', '$data[ios_version_min]', '$data[ios_version_max]', '$data[android_version_min]', '$data[android_version_max]', '$data[geo_targeting]', '$data[publication_targeting]', $data[channel_targeting], '$data[device_targeting]')", $maindb);
+mysql_query("INSERT INTO md_campaigns (campaign_owner, campaign_status, campaign_type, campaign_name, campaign_desc, campaign_start, campaign_end, campaign_creationdate, campaign_networkid, campaign_priority, target_iphone, target_ipod, target_ipad, target_android, target_other, ios_version_min, ios_version_max, android_version_min, android_version_max, country_target, publication_target, channel_target, device_target,budget,bid_pricing,max_pricing)
+VALUES ('$user_detail[user_id]', '1', '$data[campaign_type]', '$data[campaign_name]', '$data[campaign_desc]', '$data[startdate_value]', '$data[enddate_value]', '$creation_timestamp', '$data[campaign_networkid]', '$data[campaign_priority]', '$data[target_iphone]', '$data[target_ipod]', '$data[target_ipad]', '$data[target_android]', '$data[target_other]', '$data[ios_version_min]', '$data[ios_version_max]', '$data[android_version_min]', '$data[android_version_max]', '$data[geo_targeting]', '$data[publication_targeting]', $data[channel_targeting], '$data[device_targeting]', '$data[budget]', '$data[bid_pricing]','$data[max_pricing]')", $maindb);
 global $created_campaign_id;
 $created_campaign_id=mysql_insert_id($maindb);
 // END: Insert Campaign into DB 
+
+if(count($targetDevices) > 0){
+// Insert device to campaigns
+    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id) VALUES ";
+    $comma = "";
+    foreach($targetDevices as $td){
+        $sql .= $comma . "($created_campaign_id,$td)";
+        $comma = ",";
+    }
+    //echo $sql;
+    mysql_query($sql, $maindb);
+}
 
 if ($data['campaign_type']!='network'){
 	if ($data['creative_type']==1){

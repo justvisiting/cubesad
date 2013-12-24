@@ -241,13 +241,30 @@ function checkAll(theForm, cName, status) {
 								  <label for="textfield"></label>
 								  <input size="10" type="text" value="<?php if (isset($editdata['total_amount'])){ echo $editdata['total_amount']; } ?>" name="total_amount" id="total_amount" />
 								  <select id="cap_type	" name="cap_type">
-								  <option <?php if (isset($editdata['cap_type']) && $editdata['cap_type']==1){echo 'selected="selected"'; } ?> value="1">impressions / day</option>
-								  <option <?php if (isset($editdata['cap_type']) && $editdata['cap_type']==2){echo 'selected="selected"'; } ?> value="2">total impressions</option>
-						
-							  </select>		<a class="tooltip" style="font-size:11px;" href="#" title="You can add either a daily impression cap or a total impression cap to your campaign. This does not make sense for network campaigns, but rather for direct sold and promotional campaigns.">Info</a>
-									<label for="total_amount">Impression Cap (optional)</label>
+                                                                    <option <?php if (isset($editdata['cap_type']) && $editdata['cap_type']==1){echo 'selected="selected"'; } ?> value="1">impressions / day</option>
+                                                                    <option <?php if (isset($editdata['cap_type']) && $editdata['cap_type']==2){echo 'selected="selected"'; } ?> value="2">total impressions</option>
+                                                                  </select>
+                                                                  <a class="tooltip" style="font-size:11px;" href="#" title="You can add either a daily impression cap or a total impression cap to your campaign. This does not make sense for network campaigns, but rather for direct sold and promotional campaigns.">Info</a>
+                                                                  <label for="total_amount">Impression Cap (optional)</label>
 								</div>
 							</div> <!-- .field-group -->
+                                                        <div class="field-group">
+                                                            <div class="field">
+                                                                    <label for="textfield">Budget</label>
+                                                                    <input size="10" type="text" value="<?php if (isset($editdata['budget'])){ echo $editdata['budget']; } ?>" name="budget" id="budget" />
+                                                            </div>
+                                                            <div class="field">
+                                                                    <label for="textfield">Bidding price</label>
+                                                                    <select id="cap_type" name="bid_pricing" onchange="changeText(this)" onclick="changeText(this)">
+                                                                        <option <?php if (isset($editdata['bid_pricing']) && $editdata['bid_pricing']==1){echo 'selected="selected"'; } ?> value="1">Impression based</option>
+                                                                        <option <?php if (isset($editdata['bid_pricing']) && $editdata['bid_pricing']==2){echo 'selected="selected"'; } ?> value="2">Clicked based</option>
+                                                                    </select>
+                                                            </div>
+                                                            <div class="field">
+                                                                    <label id="maxlabel" for="textfield">Max CPC</label>
+                                                                    <input size="10" type="text" value="<?php if (isset($editdata['max_pricing'])){ echo $editdata['max_pricing']; } ?>" name="max_pricing" id="max_pricing"/>
+                                                            </div>
+                                                        </div>
                             
                             		</div> <!-- .widget-content -->
 						
@@ -386,100 +403,71 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
 <!--      <div style="color:#999; font-size:11px;">Device Targeting</div>
  -->                                    
                                     <table style=" -moz-border-radius: 5px; border-radius: 5px; margin-top:5px;" id="devicetargetingtable" width="800" border="0">
-  <tr>
-    <td width="26%"><div><input <?php if (isset($editdata['target_iphone']) && $editdata['target_iphone']==1){echo 'checked="checked"'; }?> name="target_iphone" value="1" type="checkbox" />iPhone <input <?php if (isset($editdata['target_ipod']) && $editdata['target_ipod']==1){echo 'checked="checked"'; }?> name="target_ipod" value="1" type="checkbox" />iPod <input <?php if (isset($editdata['target_ipad']) && $editdata['target_ipad']==1){echo 'checked="checked"'; }?> name="target_ipad" value="1" type="checkbox" />iPad</div><div><input <?php if (isset($editdata['target_android']) && $editdata['target_android']==1){echo 'checked="checked"'; }?> name="target_android" value="1" type="checkbox" />Android</div><div><input <?php if (isset($editdata['target_other']) && $editdata['target_other']==1){echo 'checked="checked"'; }?>  name="target_other" value="1" type="checkbox" />Other</div></td>
-    <td width="2%">&nbsp;</td>
-    <td width="72%"><div>Min: <select name="ios_version_min" id="id_ios_version_min">
-    
-       <option <?php if (empty($editdata['ios_version_min'])){echo 'selected="selected"'; } ?> value="">No Min</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="2.0"){echo 'selected="selected"'; } ?> value="2.0">2.0</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="2.1"){echo 'selected="selected"'; } ?> value="2.1">2.1</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="3.0"){echo 'selected="selected"'; } ?> value="3.0">3.0</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="3.1"){echo 'selected="selected"'; } ?> value="3.1">3.1</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="3.2"){echo 'selected="selected"'; } ?> value="3.2">3.2</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="4.0"){echo 'selected="selected"'; } ?> value="4.0">4.0</option>
-         
-        <option  <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="4.1"){echo 'selected="selected"'; } ?>value="4.1">4.1</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="4.2"){echo 'selected="selected"'; } ?> value="4.2">4.2</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="4.3"){echo 'selected="selected"'; } ?> value="4.3">4.3</option>
-         
-        <option <?php if (isset ($editdata['ios_version_min']) && $editdata['ios_version_min']=="5.0"){echo 'selected="selected"'; } ?> value="5.0">5.0</option>
-         
-      </select> Max: 
-       
-      <select name="ios_version_max" id="id_ios_version_max">
-         
-        <option <?php if (empty($editdata['ios_version_max'])){echo 'selected="selected"'; } ?> value="">No Max</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="2.0"){echo 'selected="selected"'; } ?> value="2.0">2.0</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="2.1"){echo 'selected="selected"'; } ?> value="2.1">2.1</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="3.0"){echo 'selected="selected"'; } ?> value="3.0">3.0</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="3.1"){echo 'selected="selected"'; } ?> value="3.1">3.1</option>
-         
-        <option  <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="3.2"){echo 'selected="selected"'; } ?> value="3.2">3.2</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="4.0"){echo 'selected="selected"'; } ?> value="4.0">4.0</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="4.1"){echo 'selected="selected"'; } ?> value="4.1">4.1</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="4.2"){echo 'selected="selected"'; } ?> value="4.2">4.2</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="4.3"){echo 'selected="selected"'; } ?> value="4.3">4.3</option>
-         
-        <option <?php if (isset ($editdata['ios_version_max']) && $editdata['ios_version_max']=="5.0"){echo 'selected="selected"'; } ?> value="5.0">5.0</option>
-         
-      </select></div><div>Min: <select name="android_version_min" id="android_version_min">
-      
-      <option <?php if (empty($editdata['android_version_min'])){echo 'selected="selected"'; } ?> value="">No Min</option>
-         
-       <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="1.5"){echo 'selected="selected"'; } ?> value="1.5">1.5</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="1.6"){echo 'selected="selected"'; } ?> value="1.6">1.6</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="2.0"){echo 'selected="selected"'; } ?> value="2.0">2.0</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="2.1"){echo 'selected="selected"'; } ?> value="2.1">2.1</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="2.2"){echo 'selected="selected"'; } ?> value="2.2">2.2</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="2.3"){echo 'selected="selected"'; } ?> value="2.3">2.3</option>
-         
-        <option <?php if (isset ($editdata['android_version_min']) && $editdata['android_version_min']=="3.0"){echo 'selected="selected"'; } ?> value="3.0">3.0</option>
-        
-      </select> Max: 
-       
-      <select name="android_version_max" id="android_version_max">
-        
-         <option <?php if (empty($editdata['android_version_max'])){echo 'selected="selected"'; } ?> value="">No Max</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="1.5"){echo 'selected="selected"'; } ?> value="1.5">1.5</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="1.6"){echo 'selected="selected"'; } ?> value="1.6">1.6</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="2.0"){echo 'selected="selected"'; } ?> value="2.0">2.0</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="2.1"){echo 'selected="selected"'; } ?> value="2.1">2.1</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="2.2"){echo 'selected="selected"'; } ?> value="2.2">2.2</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="2.3"){echo 'selected="selected"'; } ?> value="2.3">2.3</option>
-         
-        <option <?php if (isset ($editdata['android_version_max']) && $editdata['android_version_max']=="3.0"){echo 'selected="selected"'; } ?> value="3.0">3.0</option>
-        
-         
-      </select></div><div>-</div></td>
-  </tr>
+                                        
+                                            <?php
+                                                $selOnPostDevices = $_POST["device"];
+                                                $compaign_id = isset($_GET["id"]) && strlen($_GET["id"]) > 0 && is_numeric($_GET["id"]) ? $_GET["id"] : NULL ;
+                                                $qry = "SELECT device_id FROM md_device_targeting WHERE campaign_id = $compaign_id";
+                                                $selDevices = mysql_query($qry,$maindb);
+                                                $sDevices = array();
+                                                while($dev = mysql_fetch_array($selDevices)){
+                                                    $sDevices[] = $dev["device_id"];
+                                                }
+                                                if(count($sDevices) == 0 && count($selOnPostDevices) > 0){
+                                                     $sDevices = $selOnPostDevices;
+                                                }
+                                                
+                                                $sql = "SELECT * FROM md_device";
+                                                $devices = mysql_query($sql,$maindb);
+                                                //print_r($devices);
+                                                
+                                                
+                                                
+                                                
+                                                while($device = mysql_fetch_array($devices)){
+                                                    $checked = "";
+                                                    if(in_array($device["device_id"],$sDevices)){
+                                                        $checked = "checked";
+                                                    }
+                                                    echo <<<EOT
+                                                    <tr>
+                                                        <td width='30%'><input $checked type="checkbox" name='device[]' value='{$device['device_id']}'>{$device["device_name"]}</td>
+                                                        <td>Min</td>
+                                                        <td>
+                                                            <select name="version_min[]">
+                                                                <option value="">No Min</option>
+                                                                <option value="2.0">2.0</option>
+                                                                <option value="2.1">2.1</option>
+                                                                <option value="3.0">3.0</option>
+                                                                <option value="3.1">3.1</option>
+                                                                <option value="3.2">3.2</option>
+                                                                <option value="4.0">4.0</option>
+                                                                <option value="4.1">4.1</option>
+                                                                <option value="4.2">4.2</option>
+                                                                <option value="4.3">4.3</option>
+                                                                <option value="5.0">5.0</option>
+                                                            </select>
+                                                        </td>
+                                                        <td>Max</td>
+                                                        <td>
+                                                            <select name="version_max[]">
+                                                                <option value="">No Max</option>
+                                                                <option value="2.0">2.0</option>
+                                                                <option value="2.1">2.1</option>
+                                                                <option value="3.0">3.0</option>
+                                                                <option value="3.1">3.1</option>
+                                                                <option value="3.2">3.2</option>
+                                                                <option value="4.0">4.0</option>
+                                                                <option value="4.1">4.1</option>
+                                                                <option value="4.2">4.2</option>
+                                                                <option value="4.3">4.3</option>
+                                                                <option value="5.0">5.0</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+EOT;
+                                                }
+                                            ?>
 </table>
 			
 									
@@ -496,6 +484,16 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
                                                     
                                                     
                                 <script src='assets/javascripts/all.js'></script>
+                                <script>
+                                    function changeText(obj) {
+                                        //alert(obj.value);
+                                        if(obj.value == 1){
+                                            document.getElementById("maxlabel").innerHTML = "Max CPC";
+                                        }else{
+                                            document.getElementById("maxlabel").innerHTML = "Max CPM";
+                                        }
+                                    }
+                                </script>
                                 
                                
 

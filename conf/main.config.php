@@ -17,9 +17,9 @@ type                                = mysql
 host                                = "localhost"
 socket                              =
 port                                =
-username                            = "madserveu"
-password                            = "madserveu"
-name                                = "madservedb"
+username                            = "root"
+password                            = ""
+name                                = "madserve"
 
 [reportingdatabase]
 useseparatereportingdatabase     = false

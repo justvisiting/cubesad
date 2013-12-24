@@ -337,6 +337,9 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_campaigns` (
   `publication_target` varchar(1) NOT NULL,
   `channel_target` varchar(1) NOT NULL,
   `device_target` varchar(1) NOT NULL,
+  `budget` float NOT NULL DEFAULT '0',
+  `bid_pricing` int(1) NOT NULL COMMENT '1.Impression based (internal name CPC) 2. Clicked based (internal name CPM)',
+  `max_pricing` float NOT NULL DEFAULT '0',
   PRIMARY KEY  (`campaign_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
 mysql_query("CREATE TABLE IF NOT EXISTS `md_campaign_limit` (
@@ -5074,7 +5077,21 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_zones` (
   KEY `publication_id` (`publication_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
 mysql_query("INSERT INTO `md_syslog` (`entry_id`, `log_type`, `time_stamp`, `status`, `details`) VALUES (NULL, 'system_install', '".time()."', '1', '');", $maindb);
-
+mysql_query("CREATE TABLE IF NOT EXISTS `md_device` "
+        . "("
+            . "`device_id` int(11) NOT NULL auto_increment,"
+            . "`device_name` varchar(200) NULL,"
+            . "PRIMARY KEY  (`device_id`)"
+        . ")",$maindb);
+mysql_query("INSERT INTO `md_device` (`device_id`,`device_name`) VALUES(NULL,'IPhone'),"
+                                                                . "(NULL,'Android')",$maindb);
+mysql_query("CREATE TABLE IF NOT EXISTS `md_device_targeting` "
+        . "("
+            . "`id` int(11) NOT NULL auto_increment,"
+            . "`campaign_id` int(11) NULL,"
+            . "`device_id` int(11) NULL,"
+            . "PRIMARY KEY  (`id`)"
+        . ")",$maindb);
 
 if ($data['mobfox_connect_type']==1){
 $mobfox_uid=$data['mf_user'];

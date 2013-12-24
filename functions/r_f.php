@@ -1534,7 +1534,6 @@ function get_placement($data){
 global $request_settings;
 global $errormessage;
 
-#md_zones - table with placement units
 $query="SELECT entry_id, publication_id, zone_type, zone_width, zone_height, zone_refresh, zone_channel, zone_lastrequest, mobfox_backfill_active, mobfox_min_cpc_active, min_cpc, min_cpm, backfill_alt_1, backfill_alt_2, backfill_alt_3 FROM md_zones WHERE zone_hash='".$request_settings['placement_hash']."'";
 
 $zone_detail=simple_query_maindb($query, true, 500);
