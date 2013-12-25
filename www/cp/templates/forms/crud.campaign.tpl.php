@@ -261,7 +261,7 @@ function checkAll(theForm, cName, status) {
                                                                     </select>
                                                             </div>
                                                             <div class="field">
-                                                                    <label id="maxlabel" for="textfield">Max CPC</label>
+                                                                    <label id="maxlabel" for="textfield">Max CPM</label>
                                                                     <input size="10" type="text" value="<?php if (isset($editdata['max_pricing'])){ echo $editdata['max_pricing']; } ?>" name="max_pricing" id="max_pricing"/>
                                                             </div>
                                                         </div>
@@ -407,26 +407,28 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
                                             <?php
                                                 $selOnPostDevices = $_POST["device"];
                                                 $compaign_id = isset($_GET["id"]) && strlen($_GET["id"]) > 0 && is_numeric($_GET["id"]) ? $_GET["id"] : NULL ;
-                                                $qry = "SELECT device_id FROM md_device_targeting WHERE campaign_id = $compaign_id";
+                                                $qry = "SELECT device_id,max,min FROM md_device_targeting WHERE campaign_id = $compaign_id";
                                                 $selDevices = mysql_query($qry,$maindb);
                                                 $sDevices = array();
                                                 while($dev = mysql_fetch_array($selDevices)){
-                                                    $sDevices[] = $dev["device_id"];
+                                                    $sDevices[$dev["device_id"]] = array(
+                                                        "max" => $dev["max"],
+                                                        "min" => $dev["min"]
+                                                    );
                                                 }
                                                 if(count($sDevices) == 0 && count($selOnPostDevices) > 0){
-                                                     $sDevices = $selOnPostDevices;
+                                                    foreach($selOnPostDevices as $sel){
+                                                        $sDevices[$sel] = array();
+                                                    }
                                                 }
                                                 
                                                 $sql = "SELECT * FROM md_device";
                                                 $devices = mysql_query($sql,$maindb);
                                                 //print_r($devices);
                                                 
-                                                
-                                                
-                                                
                                                 while($device = mysql_fetch_array($devices)){
                                                     $checked = "";
-                                                    if(in_array($device["device_id"],$sDevices)){
+                                                    if(in_array($device["device_id"],  array_keys($sDevices))){
                                                         $checked = "checked";
                                                     }
                                                     echo <<<EOT
@@ -434,38 +436,127 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
                                                         <td width='30%'><input $checked type="checkbox" name='device[]' value='{$device['device_id']}'>{$device["device_name"]}</td>
                                                         <td>Min</td>
                                                         <td>
-                                                            <select name="version_min[]">
+EOT;
+                                                    /*$check = "";
+                                                    if(in_array($device["device_id"],$sDevices)){
+                                                        $check = "checked";
+                                                    }*/
+                                                        
+                                                   
+                                                      
+                                                    $deviceId = $device["device_id"];
+                                                    $str = '<select name="version_min'.$device[device_id].'">
                                                                 <option value="">No Min</option>
-                                                                <option value="2.0">2.0</option>
-                                                                <option value="2.1">2.1</option>
-                                                                <option value="3.0">3.0</option>
-                                                                <option value="3.1">3.1</option>
-                                                                <option value="3.2">3.2</option>
-                                                                <option value="4.0">4.0</option>
-                                                                <option value="4.1">4.1</option>
-                                                                <option value="4.2">4.2</option>
-                                                                <option value="4.3">4.3</option>
-                                                                <option value="5.0">5.0</option>
-                                                            </select>
-                                                        </td>
+                                                            <option ';
+                                                            if( $sDevices[$deviceId]["min"] == "2.0") { 
+                                                                $str.= "selected" ;
+                                                            } 
+                                                    $str.=' value="2.0">2.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "2.1"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="2.1">2.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "3.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.0">3.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "3.1"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.1">3.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "3.2"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.2">3.2</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "4.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.0">4.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "4.1"){
+                                                       $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.1">4.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "4.2"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.2">4.2</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "4.3"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.3">4.3</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["min"] == "5.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="5.0">5.0</option>';
+                                                    $str.='</td>
                                                         <td>Max</td>
                                                         <td>
-                                                            <select name="version_max[]">
+                                                            <select name="version_max'.$device[device_id].'">
                                                                 <option value="">No Max</option>
-                                                                <option value="2.0">2.0</option>
-                                                                <option value="2.1">2.1</option>
-                                                                <option value="3.0">3.0</option>
-                                                                <option value="3.1">3.1</option>
-                                                                <option value="3.2">3.2</option>
-                                                                <option value="4.0">4.0</option>
-                                                                <option value="4.1">4.1</option>
-                                                                <option value="4.2">4.2</option>
-                                                                <option value="4.3">4.3</option>
-                                                                <option value="5.0">5.0</option>
-                                                            </select>
+                                                               
+ <option ';
+                                                            if( $sDevices[$deviceId]["max"] == "2.0") { 
+                                                                $str.= "selected" ;
+                                                            } 
+                                                    $str.=' value="2.0">2.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "2.1"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="2.1">2.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "3.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.0">3.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "3.1"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.1">3.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "3.2"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="3.2">3.2</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "4.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.0">4.0</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "4.1"){
+                                                       $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.1">4.1</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "4.2"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.2">4.2</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "4.3"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="4.3">4.3</option>';
+                                                    $str.='<option ';
+                                                    if($sDevices[$deviceId]["max"] == "5.0"){
+                                                        $str.= "selected" ;
+                                                    }
+                                                    $str.=' value="5.0">5.0</option></select>
                                                         </td>
-                                                    </tr>
-EOT;
+                                                    </tr>';
+                                                    
+                                                    echo $str;
                                                 }
                                             ?>
 </table>
@@ -487,7 +578,7 @@ EOT;
                                 <script>
                                     function changeText(obj) {
                                         //alert(obj.value);
-                                        if(obj.value == 1){
+                                        if(obj.value == 2){
                                             document.getElementById("maxlabel").innerHTML = "Max CPC";
                                         }else{
                                             document.getElementById("maxlabel").innerHTML = "Max CPM";

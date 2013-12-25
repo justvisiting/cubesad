@@ -178,8 +178,21 @@ $current_month=date("m");
 $current_year=date("Y");
 $current_timestamp=time();
 
-$select_query="select entry_id from md_reporting where publication_id='".$publication_id."' AND zone_id='".$zone_id."' AND campaign_id='".$campaign_id."' AND creative_id='".$creative_id."' AND network_id='".$network_id."' AND date='".$current_date."' LIMIT 1";
+// edit by raj
+// manage new row for each hrs in reporting.
+//$current_timestamp = strtotime(date("Y-m-d H:i:s"));
+$current_minutes_secs = date("i") * 60 + date("s");
+$current_hour_timestamp = $current_timestamp - $current_minutes_secs;
+$next_hour_timestamp = $current_hour_timestamp + 3600;
+//echo date("Y-m-d H:i:s"). "<br/>";
+//echo date("Y-m-d H:i:s",$current_hour_timestamp) . "<br/>";;
+//echo date("Y-m-d H:i:s",$next_hour_timestamp) . "<br/>";;
+//echo date("h:i:s");
+//$current_hour_timestamp = strtotime(date("Y-m-d H"));
+//$next_hour_timestamp = $current_timestamp + 3600;
 
+$select_query="select entry_id from md_reporting where publication_id='".$publication_id."' AND zone_id='".$zone_id."' AND campaign_id='".$campaign_id."' AND creative_id='".$creative_id."' AND network_id='".$network_id."' AND time_stamp BETWEEN $current_hour_timestamp AND $next_hour_timestamp LIMIT 1";
+//echo $select_query;
 global $repdb_connected;
 
 if ($repdb_connected==1){
@@ -217,12 +230,27 @@ return false;
 
 }
 
+//edit by raj
+// also update md_campaign_view each time whenever we get click or impression on page. 
+$qry = "SELECT max_pricing,campaign_owner FROM md_campaigns WHERE campaign_id = $campaign_id";
+$result = mysql_query($qry);
+if(!$result){
+    die("db error");
+}
+$row = mysql_fetch_row($result);
+$debit = $row[0];
+$advertiser_id = $row[1];
+$isClick = ($add_click == 1) ? 2 : 1;
+$sql = "INSERT INTO md_campaign_view (timestamp, is_impression, debit, advertiser_id,publication_id,campaign_id) VALUES($current_timestamp,$isClick,$debit,$advertiser_id,$publication_id,$campaign_id)";
+mysql_query($sql,$repdb);
+
 if ($repcard_detail['entry_id']>0){
-mysql_query("UPDATE md_reporting set total_requests=total_requests+".$add_request.", total_requests_sec=total_requests_sec+".$add_request_sec.", total_impressions=total_impressions+".$add_impression.", total_clicks=total_clicks+".$add_click." WHERE entry_id='".$repcard_detail['entry_id']."'", $repdb);
+    mysql_query("UPDATE md_reporting set total_requests=total_requests+".$add_request.", total_requests_sec=total_requests_sec+".$add_request_sec.", total_impressions=total_impressions+".$add_impression.", total_clicks=total_clicks+".$add_click." WHERE entry_id='".$repcard_detail['entry_id']."'", $repdb);
 }
 else {
-mysql_query("INSERT INTO md_reporting (type, date, day, month, year, publication_id, zone_id, campaign_id, creative_id, network_id, total_requests, total_requests_sec, total_impressions, total_clicks)
-VALUES ('1', '".$current_date."', '".$current_day."', '".$current_month."', '".$current_year."', '".$publication_id."', '".$zone_id."', '".$campaign_id."', '".$creative_id."', '".$network_id."', '".$add_request."', '".$add_request_sec."', '".$add_impression."', '".$add_click."')", $repdb);	
+    $sql = "INSERT INTO md_reporting (type, time_stamp, date, day, month, year, publication_id, zone_id, campaign_id, creative_id, network_id, total_requests, total_requests_sec, total_impressions, total_clicks)
+    VALUES ('1',$current_timestamp,'".$current_date."', '".$current_day."', '".$current_month."', '".$current_year."', '".$publication_id."', '".$zone_id."', '".$campaign_id."', '".$creative_id."', '".$network_id."', '".$add_request."', '".$add_request_sec."', '".$add_impression."', '".$add_click."')";
+    mysql_query($sql, $repdb);	
 }
 
 

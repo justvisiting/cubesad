@@ -1,4 +1,5 @@
 <?php
+include_once 'custom_functions.php';
 error_reporting(0);
 global $edited;
 global $updated;
@@ -1745,6 +1746,36 @@ if(empty($data["max_pricing"])){
     $editdata=$data;
     return false;
 }
+
+/*$no_min_max = false;
+if(is_array($data["device"])){
+    foreach($data["device"] as $td){
+        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : NULL;
+        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : NULL;
+        if($min == NULL || $max == NULL){
+            $no_min_max = true;
+            break;
+        }
+    }
+}
+if($no_min_max || !is_array($data["device"])){
+    global $errormessage;
+    $errormessage='Invalid Min Or Max Value for Device';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}*/
+
+/*if(!is_array($data["version_min"]) || count($data["version_min"]) == 0){
+    global $errormessage;
+    $errormessage='Select Minimum Value For Devices';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}else if(count($data["version_min"]) > 0){
+    foreach()
+}*/
+
 if ($data['start_date_type']==2){
 $start_date=explode('/',$data['startdate_value']);
 $start_date_array['year']=$start_date[2];
@@ -1842,16 +1873,30 @@ mysql_query("UPDATE md_campaigns set campaign_type='$data[campaign_type]', campa
 
 reset_campaign_targeting($detail);
 
+$creationTime = mysql_query("SELECT campaign_creationdate FROM md_campaigns WHERE campaign_id = $detail",$maindb);
+$createTimeStamp = "";
+while($createTime = mysql_fetch_array($creationTime)){
+    $createTimeStamp = $createTime["campaign_creationdate"];
+}
+//Insert Campaign into md_campaign_bid to maintain which bid price is related to which campaign
+//Into specific time interval.
+mysql_query("INSERT INTO md_campaign_bid (campaign_id,bid_pricing,max_pricing,creation_date) VALUES('$detail','$data[bid_pricing]','$data[max_pricing]','$createTimeStamp')",$maindb);
+
+
 // delete old records from md_device_targeting
 $sql = "DELETE FROM md_device_targeting WHERE campaign_id = $detail";
 mysql_query($sql,$maindb);
 if(count($targetDevices) > 0){
 // Insert device to campaigns
-    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id) VALUES ";
+    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id,max,min) VALUES ";
     $comma = "";
+    $i = 0;
     foreach($targetDevices as $td){
-        $sql .= $comma . "($detail,$td)";
+        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : 0;
+        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : 0;
+        $sql .= $comma . "($detail,$td,$max,$min)";
         $comma = ",";
+        $i ++;
     }
     //echo $sql;
     mysql_query($sql, $maindb);
@@ -2809,8 +2854,24 @@ if(empty($data["max_pricing"])){
     $editdata=$data;
     return false;
 }
-
-
+/*$no_min_max = false;
+if(is_array($data["device"])){
+    foreach($data["device"] as $td){
+        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : NULL;
+        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : NULL;
+        if($min == NULL || $max == NULL){
+            $no_min_max = true;
+            break;
+        }
+    }
+}
+if($no_min_max || !is_array($data["device"])){
+    global $errormessage;
+    $errormessage='Invalid Min Or Max Value for Device';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}*/
 // Define Image Sizes
 if ($data['creative_format']==1){$data['custom_creative_width']=320; $data['custom_creative_height']=50;}
 if ($data['creative_format']==2){$data['custom_creative_width']=300; $data['custom_creative_height']=250;}
@@ -3016,13 +3077,21 @@ global $created_campaign_id;
 $created_campaign_id=mysql_insert_id($maindb);
 // END: Insert Campaign into DB 
 
+//Insert Campaign into md_campaign_bid to maintain which bid price is related to which campaign
+// into specific time interval.
+mysql_query("INSERT INTO md_campaign_bid (campaign_id,bid_pricing,max_pricing,creation_date) VALUES('$created_campaign_id','$data[bid_pricing]','$data[max_pricing]','$creation_timestamp')",$maindb);
+
 if(count($targetDevices) > 0){
 // Insert device to campaigns
-    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id) VALUES ";
+    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id,max,min) VALUES ";
     $comma = "";
+    $i = 0;
     foreach($targetDevices as $td){
-        $sql .= $comma . "($created_campaign_id,$td)";
+        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : 0;
+        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : 0;
+        $sql .= $comma . "($created_campaign_id,$td,$max,$min)";
         $comma = ",";
+        $i ++;
     }
     //echo $sql;
     mysql_query($sql, $maindb);
@@ -5152,7 +5221,7 @@ return $sorting_query;
 }
 
 function print_summary_widget($data){
-
+//require 'custom_funcitons.php';
 if (!MAD_connect_repdb()){
 echo "Could not connect to reporting database. Exiting."; exit;	
 }
@@ -5161,8 +5230,6 @@ global $repdb;
 }
 	
 $query='SELECT SUM(total_requests) AS total_requests, SUM(total_requests_sec) AS total_requests_sec, SUM(total_impressions) AS total_impressions, SUM(total_clicks) AS total_clicks, date, publication_id, zone_id, campaign_id, creative_id, network_id FROM md_reporting '.get_rep_limitation_query($data).' '.get_rep_date_query($data).'';
-
-
 	
 $result_report=mysql_query($query, $repdb);
 $report_detail=mysql_fetch_array($result_report);
@@ -5179,53 +5246,60 @@ $report_detail['fillrate']=@($report_detail['total_impressions']/$report_detail[
 $report_detail['fillrate']=number_format($report_detail['fillrate'], 2);
 
 if ($data['report_type']=='campaign'){
-
+$budget = (float) getBudgetForCampaigns($data);
 echo '<div class="widget widget-plain"> <div class="widget-content">
 				
 					
 							
 						
-						<div class="dashboard_report defaultState"  style="width:31%">
+						<div class="dashboard_report defaultState" >
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['total_impressions'], 0).'</span> Impressions
 							</div> <!-- .pad -->
 						</div>
 						
-						<div class="dashboard_report defaultState" style="width:31%">
+						<div class="dashboard_report defaultState">
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['total_clicks'], 0).'</span> Clicks
 							</div> <!-- .pad -->
 						</div>
 						
-						<div class="dashboard_report defaultState last" style="width:31%">
+						<div class="dashboard_report defaultState">
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['ctr'], 2).'%</span> CTR
 							</div> <!-- .pad -->
 						</div>
-						
+                                                
+						<div class="dashboard_report defaultState last">
+							<div class="pad">
+								<span class="value">'.number_format($budget, 2).'</span>Remaining Budget
+							</div> <!-- .pad -->
+						</div>
 					</div> <!-- .widget-content -->
 					
 				</div> <!-- .widget -->';
 }
 
 if ($data['report_type']=='publication' or $data['report_type']=='network'){
-	
+	if($data["report_type"] == "publication"){
+            $earning = getEarningFromCampaign($data);
+        }
 	echo '<div class="widget widget-plain"> <div class="widget-content">
 				
-					<div class="dashboard_report defaultState">
+					<div class="dashboard_report defaultState" style="width:18%">
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['total_requests'], 0).'</span> Requests
 							</div> <!-- .pad -->
 						</div>
 							
 						
-						<div class="dashboard_report defaultState">
+						<div class="dashboard_report defaultState" style="width:18%">
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['total_impressions'], 0).'</span> Impressions
 							</div> <!-- .pad -->
 						</div>
 						
-						<div class="dashboard_report defaultState">
+						<div class="dashboard_report defaultState" style="width:18%">
 							<div class="pad">
 								<span class="value">'.number_format($report_detail['total_clicks'], 0).'</span> Clicks
 							</div> <!-- .pad -->
@@ -5233,12 +5307,20 @@ if ($data['report_type']=='publication' or $data['report_type']=='network'){
 						
 						
 						
-						<div  class="dashboard_report defaultState last">
+						<div  class="dashboard_report defaultState" style="width:18%">
 							<div class="pad">
 								<span style="font-size:25px;" class="value">'.number_format($report_detail['ctr'], 2).'% / '.number_format($report_detail['fillrate'], 2).'%</span> CTR / Fill Rate
 							</div> <!-- .pad -->
-						</div>
-						
+						</div>';
+        
+                                                if($data['report_type']=='publication'){
+                                                    echo '<div  class="dashboard_report defaultState last" style="width:18%">
+							<div class="pad">
+								<span style="font-size:25px;" class="value">'.number_format($earning, 2).'</span>Earning
+							</div> <!-- .pad -->
+                                                     </div>';
+                                                }
+                                                echo '
 					</div> <!-- .widget-content -->
 					
 				</div> <!-- .widget -->';
@@ -5422,8 +5504,14 @@ echo '<th width="16%">Requests</th>';
 echo '<th width="17%">Impressions</th>';
 echo '<th width="15%">Clicks</th>';
 echo '<th width="19%">CTR</th>';
+if($data["report_type"] == 'campaign'){
+    echo '<th width="19%">Remaining Budget</th>';
+}
 if ($data['report_type']=='publication' or $data['report_type']=='network'){
-echo '<th width="16%">Fill Rate</th>';
+    echo '<th width="16%">Fill Rate</th>';
+    if($data["report_type"] == 'publication'){
+        echo '<th width="19%">Earning</th>';
+    }
 }
 echo '</tr>
 </thead>
@@ -5465,7 +5553,11 @@ $report_detail['fillrate']=number_format($report_detail['fillrate'], 2);
 echo '<td>'.$report_detail['fillrate'].'%</td>';
 }
 
-
+if($data["report_type"] == "campaign"){
+    echo '<td>'."".'</td>';
+}else if($data["report_type"] == "publication"){
+    echo '<td>'."".'</td>';
+}
 
 
 echo '</tr>';
