@@ -56,8 +56,19 @@ exit;
 			</div> <!-- .login_fields -->
 			
 			<div class="login_actions">
+                            <center>
 				<button type="submit" class="btn btn-primary" tabindex="3">Login</button>
+                            </center>
 			</div>
+                        <div class="login_actions">
+                            <div style="float: left">
+                                <a href="adv_signup.php" class="btn btn-primary" tabindex="4">Signup As Advertiser</a>
+                            </div>
+                            <div style="float:right">
+                                <a href="pub_signup.php" class="btn btn-primary" tabindex="5">Signup As Publisher</a>
+                            </div>
+                            <br style="clear: both" />
+                        </div>
 		</form>
 	</div> <!-- #login_panel -->		
 </div> <!-- #login -->

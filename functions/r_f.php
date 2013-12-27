@@ -1,4 +1,5 @@
 <?php
+require_once dirname(__FILE__) . "/../www/cp/custom_functions.php";
 //error_reporting(0);
 global $repdb_connected;
 $repdb_connected=0;
@@ -229,20 +230,11 @@ return false;
 }
 
 }
-
-//edit by raj
-// also update md_campaign_view each time whenever we get click or impression on page. 
-$qry = "SELECT max_pricing,campaign_owner FROM md_campaigns WHERE campaign_id = $campaign_id";
-$result = mysql_query($qry);
-if(!$result){
-    die("db error");
+// insert into md_campaign_view table whenever campaign is paying for click or for impression 
+// and we get impression or click accroding to selected campaign.
+if(function_exists("insertClickOrImpression")){
+    insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
 }
-$row = mysql_fetch_row($result);
-$debit = $row[0];
-$advertiser_id = $row[1];
-$isClick = ($add_click == 1) ? 2 : 1;
-$sql = "INSERT INTO md_campaign_view (timestamp, is_impression, debit, advertiser_id,publication_id,campaign_id) VALUES($current_timestamp,$isClick,$debit,$advertiser_id,$publication_id,$campaign_id)";
-mysql_query($sql,$repdb);
 
 if ($repcard_detail['entry_id']>0){
     mysql_query("UPDATE md_reporting set total_requests=total_requests+".$add_request.", total_requests_sec=total_requests_sec+".$add_request_sec.", total_impressions=total_impressions+".$add_impression.", total_clicks=total_clicks+".$add_click." WHERE entry_id='".$repcard_detail['entry_id']."'", $repdb);

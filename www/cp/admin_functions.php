@@ -1245,7 +1245,7 @@ echo '<option '.$selected_html.' value="'.$group_detail['entry_id'].'">'.$group_
 function get_pubtype_dropdown($selected){
 global $maindb;	
 
-echo "<option value=''>- Select Publication Type -</option>";
+echo "<option value=''>- Select Publisher Type -</option>";
 
 $usrres=mysql_query("select * from md_publication_types ORDER BY entry_id ASC", $maindb);
 while($pubtype_detail=mysql_fetch_array($usrres)){
@@ -1671,7 +1671,7 @@ return false;
 }
 */
 $targetDevices = array();
-// edit by nitesh
+
 if($data['device_targeting'] ==2){
     if( !isset($data["device"]) || isset($data["device"]) && is_array($data["device"]) && count($data["device"]) == 0){
         global $errormessage;
@@ -1734,7 +1734,7 @@ if(empty($data["budget"])){
 
 if(empty($data["bid_pricing"])){
     global $errormessage;
-    $errormessage='Choose Bidding price for your campaign';
+    $errormessage='Choose Bidding Type for your campaign';
     global $editdata;
     $editdata=$data;
     return false;	
@@ -1864,49 +1864,19 @@ $data['publication_targeting']=sanitize($data['publication_targeting']);
 $data['channel_targeting']=sanitize($data['channel_targeting']);
 $data['device_targeting']=sanitize($data['device_targeting']);
 $data["budget"] = sanitize($data["budget"]);
-$data["bid_pricing"] = sanitize($data["bid_pricing"]);
+$data["bid_type"] = sanitize($data["bid_pricing"]);
 $data["max_pricing"] = sanitize($data["max_pricing"]);
 
 global $maindb;
 
-mysql_query("UPDATE md_campaigns set campaign_type='$data[campaign_type]', campaign_name='$data[campaign_name]', campaign_desc='$data[campaign_desc]', campaign_start='$data[startdate_value]', campaign_end='$data[enddate_value]', campaign_networkid='$data[campaign_networkid]', campaign_priority='$data[campaign_priority]', target_iphone='$data[target_iphone]', target_ipod='$data[target_ipod]', target_ipad='$data[target_ipad]', target_android='$data[target_android]', target_other='$data[target_other]', ios_version_min='$data[ios_version_min]', ios_version_max='$data[ios_version_max]', android_version_min='$data[android_version_min]', android_version_max='$data[android_version_max]', country_target='$data[geo_targeting]', publication_target='$data[publication_targeting]', channel_target='$data[channel_targeting]', device_target='$data[device_targeting]' , budget='$data[budget]', bid_pricing='$data[bid_pricing]', max_pricing='$data[max_pricing]' where campaign_id='$detail'", $maindb);
+mysql_query("UPDATE md_campaigns set campaign_type='$data[campaign_type]', campaign_name='$data[campaign_name]', campaign_desc='$data[campaign_desc]', campaign_start='$data[startdate_value]', campaign_end='$data[enddate_value]', campaign_networkid='$data[campaign_networkid]', campaign_priority='$data[campaign_priority]', target_iphone='$data[target_iphone]', target_ipod='$data[target_ipod]', target_ipad='$data[target_ipad]', target_android='$data[target_android]', target_other='$data[target_other]', ios_version_min='$data[ios_version_min]', ios_version_max='$data[ios_version_max]', android_version_min='$data[android_version_min]', android_version_max='$data[android_version_max]', country_target='$data[geo_targeting]', publication_target='$data[publication_targeting]', channel_target='$data[channel_targeting]', device_target='$data[device_targeting]' , budget='$data[budget]', bid_type='$data[bid_type]', max_pricing='$data[max_pricing]' where campaign_id='$detail'", $maindb);
 
 reset_campaign_targeting($detail);
+//custom_funcitons.php
+//insertBidPriceIntoCampaignReporting($detail, $maindb, $data);
+//custom_functions.php
+insertDeviceTargeting($targetDevices, $detail, $maindb, $data);
 
-$creationTime = mysql_query("SELECT campaign_creationdate FROM md_campaigns WHERE campaign_id = $detail",$maindb);
-$createTimeStamp = "";
-while($createTime = mysql_fetch_array($creationTime)){
-    $createTimeStamp = $createTime["campaign_creationdate"];
-}
-//Insert Campaign into md_campaign_bid to maintain which bid price is related to which campaign
-//Into specific time interval.
-mysql_query("INSERT INTO md_campaign_bid (campaign_id,bid_pricing,max_pricing,creation_date) VALUES('$detail','$data[bid_pricing]','$data[max_pricing]','$createTimeStamp')",$maindb);
-
-
-// delete old records from md_device_targeting
-$sql = "DELETE FROM md_device_targeting WHERE campaign_id = $detail";
-mysql_query($sql,$maindb);
-if(count($targetDevices) > 0){
-// Insert device to campaigns
-    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id,max,min) VALUES ";
-    $comma = "";
-    $i = 0;
-    foreach($targetDevices as $td){
-        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : 0;
-        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : 0;
-        $sql .= $comma . "($detail,$td,$max,$min)";
-        $comma = ",";
-        $i ++;
-    }
-    //echo $sql;
-    mysql_query($sql, $maindb);
-}
-
-//update devices according to campaign
-/*if(count($targetDevices) > 0){
-    $device_ids = "'" . implode(",", $targetDevices) . "'";
-    mysql_query("UPDATE md_device_targeting SET device_id = $device_ids WHERE campaign_id = $detail",$maindb);
-}*/
 
 // Extra Targeting Variables
 
@@ -1991,9 +1961,9 @@ $data['company_state']=sanitize($data['company_state']);
 $data['company_zip']=sanitize($data['company_zip']);
 $data['company_country']=sanitize($data['company_country']);
 $data['tax_id']=sanitize($data['tax_id']);
+$data["paypal_id"] = sanitize($data['paypal_id']);
 
-
-mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', account_type='$data[account_type]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' where user_id='$detail'", $maindb);
+mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', account_type='$data[account_type]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' , paypal_id = '$data[paypal_id]' where user_id='$detail'", $maindb);
 
 if (!empty($data['new_password'])){
 
@@ -2145,14 +2115,31 @@ return true;
 		}
 	
 	if ($type=='publication'){
-		
-if (empty($data['inv_name']) or !is_numeric($data['inv_type']) or empty($data['inv_address']) or !is_numeric($data['inv_defaultchannel'])){
-global $errormessage;
-$errormessage='Please fill out all required fields.';
-global $editdata;
-$editdata=$data;
-return false;	
+if (empty($data['inv_name']) or empty($data["email_address"]) or empty($data["pass_word"]) or empty($data["confirm_pass_word"]) or !is_numeric($data['inv_type']) or empty($data['inv_address']) or !is_numeric($data['inv_defaultchannel'])){
+    global $errormessage;
+    $errormessage='Please fill out all required fields.';
+    global $editdata;
+    $editdata=$data;
+    return false;	
 }
+
+if(pub_isDuplicateEmail($data["email_address"],$maindb,$detail) == TRUE){
+    global $errormessage;
+    $errormessage='A user with this e-mail address already exists in the system.';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}
+
+
+if($data["pass_word"] != $data["confirm_pass_word"]){
+    global $errormessage;
+    $errormessage='The passwords you entered do not match.';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}
+
 
 $data['inv_type']=sanitize($data['inv_type']);
 $data['inv_name']=sanitize($data['inv_name']);
@@ -2160,8 +2147,12 @@ $data['inv_description']=sanitize($data['inv_description']);
 $data['inv_address']=sanitize($data['inv_address']);
 $data['inv_defaultchannel']=sanitize($data['inv_defaultchannel']);
 
+$data['email_address']=sanitize($data['email_address']);
+$data['pass_word']=sanitize($data['pass_word']);
+$data['paypal_id']=sanitize($data['paypal_id']);
+$data['password_md5']=md5($data['pass_word']);
 
-mysql_query("UPDATE md_publications set inv_type='$data[inv_type]', inv_name='$data[inv_name]', inv_description='$data[inv_description]', inv_address='$data[inv_address]', inv_defaultchannel='$data[inv_defaultchannel]' where inv_id='$detail'", $maindb);
+mysql_query("UPDATE md_publications set inv_type='$data[inv_type]', inv_name='$data[inv_name]', inv_description='$data[inv_description]', inv_address='$data[inv_address]', inv_defaultchannel='$data[inv_defaultchannel]' , email_address = '$data[email_address]' , pass_word = '$data[password_md5]' , paypal_id = '$data[paypal_id]'  where inv_id='$detail'", $maindb);
 
 return true;
 
@@ -2332,10 +2323,11 @@ $data['company_zip']=sanitize($data['company_zip']);
 $data['company_country']=sanitize($data['company_country']);
 $data['tax_id']=sanitize($data['tax_id']);
 $data['account_type']=sanitize($data['account_type']);
+$data["paypal_id"] = sanitize($data['paypal_id']);
 
 global $maindb;
-mysql_query("INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date)
-VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date')", $maindb);
+mysql_query("INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,paypal_id)
+VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date','$data[paypal_id]')", $maindb);
 global $created_user_id;
 $created_user_id=mysql_insert_id($maindb);
 
@@ -2691,7 +2683,6 @@ return false;
 }
 */
 $targetDevices = array();
-// edit by nitesh
 if($data['device_targeting'] ==2){
     if( !isset($data["device"]) || isset($data["device"]) && is_array($data["device"]) && count($data["device"]) == 0){
         global $errormessage;
@@ -2842,7 +2833,7 @@ if(empty($data["budget"])){
 
 if(empty($data["bid_pricing"])){
     global $errormessage;
-    $errormessage='Choose Bidding price for your campaign';
+    $errormessage='Choose Bidding Type for your campaign';
     global $editdata;
     $editdata=$data;
     return false;	
@@ -3066,36 +3057,21 @@ $data['publication_targeting']=sanitize($data['publication_targeting']);
 $data['channel_targeting']=sanitize($data['channel_targeting']);
 $data['device_targeting']=sanitize($data['device_targeting']);
 $data["budget"] = sanitize($data["budget"]);
-$data["bid_pricing"] = sanitize($data["bid_pricing"]);
+$data["bid_type"] = sanitize($data["bid_pricing"]);
 $data["max_pricing"] = sanitize($data["max_pricing"]);
 
 
 // Insert Campaign into DB
-mysql_query("INSERT INTO md_campaigns (campaign_owner, campaign_status, campaign_type, campaign_name, campaign_desc, campaign_start, campaign_end, campaign_creationdate, campaign_networkid, campaign_priority, target_iphone, target_ipod, target_ipad, target_android, target_other, ios_version_min, ios_version_max, android_version_min, android_version_max, country_target, publication_target, channel_target, device_target,budget,bid_pricing,max_pricing)
-VALUES ('$user_detail[user_id]', '1', '$data[campaign_type]', '$data[campaign_name]', '$data[campaign_desc]', '$data[startdate_value]', '$data[enddate_value]', '$creation_timestamp', '$data[campaign_networkid]', '$data[campaign_priority]', '$data[target_iphone]', '$data[target_ipod]', '$data[target_ipad]', '$data[target_android]', '$data[target_other]', '$data[ios_version_min]', '$data[ios_version_max]', '$data[android_version_min]', '$data[android_version_max]', '$data[geo_targeting]', '$data[publication_targeting]', $data[channel_targeting], '$data[device_targeting]', '$data[budget]', '$data[bid_pricing]','$data[max_pricing]')", $maindb);
+mysql_query("INSERT INTO md_campaigns (campaign_owner, campaign_status, campaign_type, campaign_name, campaign_desc, campaign_start, campaign_end, campaign_creationdate, campaign_networkid, campaign_priority, target_iphone, target_ipod, target_ipad, target_android, target_other, ios_version_min, ios_version_max, android_version_min, android_version_max, country_target, publication_target, channel_target, device_target,budget,bid_type,max_pricing)
+VALUES ('$user_detail[user_id]', '1', '$data[campaign_type]', '$data[campaign_name]', '$data[campaign_desc]', '$data[startdate_value]', '$data[enddate_value]', '$creation_timestamp', '$data[campaign_networkid]', '$data[campaign_priority]', '$data[target_iphone]', '$data[target_ipod]', '$data[target_ipad]', '$data[target_android]', '$data[target_other]', '$data[ios_version_min]', '$data[ios_version_max]', '$data[android_version_min]', '$data[android_version_max]', '$data[geo_targeting]', '$data[publication_targeting]', $data[channel_targeting], '$data[device_targeting]', '$data[budget]', '$data[bid_type]','$data[max_pricing]')", $maindb);
 global $created_campaign_id;
 $created_campaign_id=mysql_insert_id($maindb);
 // END: Insert Campaign into DB 
 
-//Insert Campaign into md_campaign_bid to maintain which bid price is related to which campaign
-// into specific time interval.
-mysql_query("INSERT INTO md_campaign_bid (campaign_id,bid_pricing,max_pricing,creation_date) VALUES('$created_campaign_id','$data[bid_pricing]','$data[max_pricing]','$creation_timestamp')",$maindb);
-
-if(count($targetDevices) > 0){
-// Insert device to campaigns
-    $sql = "INSERT INTO md_device_targeting (campaign_id,device_id,max,min) VALUES ";
-    $comma = "";
-    $i = 0;
-    foreach($targetDevices as $td){
-        $min = isset($data["version_min$td"]) ? $data["version_min$td"] : 0;
-        $max = isset($data["version_max$td"]) ? $data["version_max$td"] : 0;
-        $sql .= $comma . "($created_campaign_id,$td,$max,$min)";
-        $comma = ",";
-        $i ++;
-    }
-    //echo $sql;
-    mysql_query($sql, $maindb);
-}
+//custom_functions.php
+//insertBidPriceIntoCampaignReporting($created_campaign_id, $maindb, $data);
+//custom_functions.php
+insertDeviceTargeting($targetDevices, $created_campaign_id, $maindb, $data);
 
 if ($data['campaign_type']!='network'){
 	if ($data['creative_type']==1){
@@ -3254,12 +3230,28 @@ if (!isset($data['mobfox_backfill_active'])){$data['mobfox_backfill_active']=0; 
 if (!isset($data['zone_height'])){$data['zone_height']=''; }
 if (!isset($data['zone_width'])){$data['zone_width']=''; }
 
-if (empty($data['inv_name']) or !is_numeric($data['inv_type']) or empty($data['inv_address']) or !is_numeric($data['inv_defaultchannel']) or !is_numeric($data['zone_refresh']) or empty($data['zone_name']) or ($data['zone_size']=='10' && (!is_numeric($data['custom_zone_width']) or !is_numeric($data['custom_zone_height']))) or  empty($data['zone_type']) or ($data['zone_type']=='banner' && !is_numeric($data['zone_size']))){
+if (empty($data['inv_name']) or empty($data["email_address"]) or empty($data["pass_word"]) or empty($data["confirm_pass_word"]) or !is_numeric($data['inv_type']) or empty($data['inv_address']) or !is_numeric($data['inv_defaultchannel']) or !is_numeric($data['zone_refresh']) or empty($data['zone_name']) or ($data['zone_size']=='10' && (!is_numeric($data['custom_zone_width']) or !is_numeric($data['custom_zone_height']))) or  empty($data['zone_type']) or ($data['zone_type']=='banner' && !is_numeric($data['zone_size']))){
 global $errormessage;
 $errormessage='Please fill out all required fields.';
 global $editdata;
 $editdata=$data;
 return false;	
+}
+
+if(pub_isDuplicateEmail($data["email_address"],$maindb) == TRUE){
+    global $errormessage;
+    $errormessage='A user with this e-mail address already exists in the system.';
+    global $editdata;
+    $editdata=$data;
+    return false;
+}
+
+if($data["pass_word"] != $data["confirm_pass_word"]){
+    global $errormessage;
+    $errormessage='The passwords you entered do not match.';
+    global $editdata;
+    $editdata=$data;
+    return false;
 }
 
 if ($data['mobfox_min_cpc_active']==1 && (!is_numeric($data['min_cpc']) or !is_numeric($data['min_cpm']) or $data['min_cpm']>5 or $data['min_cpc']>0.20)){
@@ -3284,8 +3276,13 @@ $data['inv_description']=sanitize($data['inv_description']);
 $data['inv_address']=sanitize($data['inv_address']);
 $data['inv_defaultchannel']=sanitize($data['inv_defaultchannel']);
 
-mysql_query("INSERT INTO md_publications (inv_status, inv_type, inv_name, inv_description, inv_address, inv_defaultchannel, creator_id)
-VALUES (1, '$data[inv_type]', '$data[inv_name]', '$data[inv_description]', '$data[inv_address]', '$data[inv_defaultchannel]', '$user_detail[user_id]')", $maindb);
+$data['email_address']=sanitize($data['email_address']);
+$data['pass_word']=sanitize($data['pass_word']);
+$data['paypal_id']=sanitize($data['paypal_id']);
+$data['password_md5']=md5($data['pass_word']);
+
+mysql_query("INSERT INTO md_publications (inv_status, inv_type, inv_name, inv_description, inv_address, inv_defaultchannel, creator_id,email_address,pass_word,paypal_id)
+VALUES (1, '$data[inv_type]', '$data[inv_name]', '$data[inv_description]', '$data[inv_address]', '$data[inv_defaultchannel]', '$user_detail[user_id]', '$data[email_address]' , '$data[password_md5]' , '$data[paypal_id]' )", $maindb);
 $new_publication_id=mysql_insert_id($maindb);
 
 if (do_create('placement', $data, $new_publication_id)){

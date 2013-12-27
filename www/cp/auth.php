@@ -5,63 +5,62 @@
 // END LOGIN CHECK
 
 function logincheck(){
-global $maindb;
-global $loginsession_id;
-if (isset($_COOKIE["md_loginsession"]) && !empty($_COOKIE["md_loginsession"])){
-$loginsession_id = $_COOKIE["md_loginsession"]; 
+    global $maindb;
+    global $loginsession_id;
+    if (isset($_COOKIE["md_loginsession"]) && !empty($_COOKIE["md_loginsession"])){
+        $loginsession_id = $_COOKIE["md_loginsession"]; 
+    }
+    if ($loginsession_id=="" or !preg_match('/^[a-f0-9]{32}$/', $loginsession_id)){
+        return false;
+    }
+    if ($loginsession_id!=""){
+        $loginsession_id = mysql_real_escape_string(stripslashes($loginsession_id), $maindb);
+        $resultv=mysql_query("select * from md_usessions where session_id='$loginsession_id' AND session_status='1'", $maindb);
+        $sessiondet=mysql_fetch_array($resultv);
+        $date_expire=$sessiondet['session_timeout'];
+        $date = time();
+        if ($date<=$date_expire){
+            $resulty=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
+            $userv=mysql_fetch_array($resulty);
+            
+            if(count($userv) > 0){
+                // Login user is advertiser or administrator
+            }else{
+                // Login user is publisher
+                $resulty=mysql_query("select * from md_publications where email_address='$sessiondet[user_identification]'", $maindb);
+                $userv=mysql_fetch_array($resulty);
+                $userv["account_status"] = 1;
+            }
+            $sespas = $sessiondet['user_password'];
+            if ($sespas==$userv['pass_word'] && $sespas!="" && $userv['account_status']==1){
+                $loggedin_status=1;
+                $new_session_timeout = $date + MAD_USER_SESSION_TIMEOUT;
+                mysql_query("UPDATE md_usessions set session_timeout='$new_session_timeout' WHERE session_status='1' AND session_id='$loginsession_id'", $maindb);
+                global $user_detail;
+                $usresult=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
+                $user_detail=mysql_fetch_array($usresult);
+                
+                if(count($user_detail) > 0){
+                    // for admin and advertiser
+                    if (is_numeric($user_detail['account_type']) && $user_detail['account_type']>1){
+                        global $user_right;
+                        $user_right_res=mysql_query("select * from md_user_rights where group_id='$user_detail[account_type]'", $maindb);
+                        $user_right=mysql_fetch_array($user_right_res); 
+                    }else if (!is_numeric($user_detail['account_type'])){
+                        global $user_right;
+                        $user_right_res=mysql_query("select * from md_user_rights where user_id='$user_detail[user_id]'", $maindb);
+                        $user_right=mysql_fetch_array($user_right_res); 
+                    }
+                }else{
+                    global $user_right;
+                    // for publisher
+                }
+                return true;
+            }
+        }
+    }
+    return false;		
 }
-if ($loginsession_id=="" or !preg_match('/^[a-f0-9]{32}$/', $loginsession_id))
-{
-	return false;
-	}
-		
-if ($loginsession_id!="") 
-{
-$loginsession_id = mysql_real_escape_string(stripslashes($loginsession_id), $maindb);
-
-$resultv=mysql_query("select * from md_usessions where session_id='$loginsession_id' AND session_status='1'", $maindb);
-$sessiondet=mysql_fetch_array($resultv);
-$date_expire=$sessiondet['session_timeout'];
-
-$date = time();
-
-if ($date<=$date_expire){
-$resulty=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
-$userv=mysql_fetch_array($resulty);
-
-$sespas = $sessiondet['user_password'];
-
-if ($sespas==$userv['pass_word'] && $sespas!="" && $userv['account_status']==1)
-{
-$loggedin_status=1;
-$new_session_timeout = $date + MAD_USER_SESSION_TIMEOUT;
-mysql_query("UPDATE md_usessions set session_timeout='$new_session_timeout' WHERE session_status='1' AND session_id='$loginsession_id'", $maindb);
-global $user_detail;
-
-$usresult=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
-$user_detail=mysql_fetch_array($usresult); 
-
-if (is_numeric($user_detail['account_type']) && $user_detail['account_type']>1){
-global $user_right;
-$user_right_res=mysql_query("select * from md_user_rights where group_id='$user_detail[account_type]'", $maindb);
-$user_right=mysql_fetch_array($user_right_res); 
-}
-else if (!is_numeric($user_detail['account_type'])){
-global $user_right;
-$user_right_res=mysql_query("select * from md_user_rights where user_id='$user_detail[user_id]'", $maindb);
-$user_right=mysql_fetch_array($user_right_res); 
-}
-
-
-return true;
-}
-}
-}
-	
-	
-return false;
-		
-	}
 	
 function logout(){
 global $maindb;

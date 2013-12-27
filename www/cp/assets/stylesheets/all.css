@@ -318,7 +318,28 @@ body {
 	left: auto;
 	top: auto;
 }
+.frontSignup
+{
+    background: #222;
 
+}
+.frontSignup #content {
+width: 500px;
+margin: 90px auto;
+padding: 0 20px;
+}
+.frontSignup #contentHeader {
+    background: none;
+    border:none;
+}
+.frontSignup #contentHeader h1 {
+background: url(../images/logo.png) no-repeat 0 0;
+width: 215px;
+height: 32px;
+line-height: 800px;
+overflow: hidden;
+margin: 0 auto .75em;
+}
 	#contentHeader {
 		top: -97px;
 	}

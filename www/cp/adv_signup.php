@@ -1,4 +1,133 @@
 <?php
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
+?>
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+    <title>Advertiser - Signup</title>
+    <meta charset="utf-8" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />		
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/images/favicon.ico" />
+    <link rel="stylesheet" href="assets/stylesheets/all.css" type="text/css" />
+
+    <!--[if gte IE 9]>
+    <link rel="stylesheet" href="assets/stylesheets/ie9.css" type="text/css" />
+    <![endif]-->
+
+    <!--[if gte IE 8]>
+    <link rel="stylesheet" href="assets/stylesheets/ie8.css" type="text/css" />
+    <![endif]-->
+</head>
+<body class="frontSignup">
+    
+    <?php
+        global $current_section;
+        $current_section='configuration';
+        require_once '../../init.php';
+        // Required files
+        require_once MAD_PATH . '/www/cp/auth.php';
+        require_once MAD_PATH . '/functions/adminredirect.php';
+        require_once MAD_PATH . '/www/cp/restricted.php';
+        require_once MAD_PATH . '/www/cp/admin_functions.php';
+        global $current_action;
+        
+        if (isset($_POST['add'])){
+                global $errormessage;
+                $errormessage = "";
+                $data = $_POST;
+                $data["account_type"] = 2;
+                $data['email_address']=strtolower($data['email_address']);
+                /*if (!check_permission('add_administrator', $user_detail['user_id']) && $data['account_type']!=2){
+                global $errormessage;
+                $errormessage='You are not permitted to add users that are not in the Advertiser group.';
+                return false;
+                }*/
+                if (empty($data['first_name']) or empty($data['last_name']) or empty($data['email_address']) or empty($data['new_password']) or empty($data['new_password_2'])){
+                global $errormessage;
+                $errormessage='Please fill out all required fields.';
+                global $editdata;
+                $editdata=$data;
+                
+                }
+
+                if ($data['new_password_2']!=$data['new_password']){
+                global $errormessage;
+                $errormessage='The passwords you entered do not match.';
+                global $editdata;
+                $editdata=$data;
+                
+                }
+
+                if (username_exists($data['email_address'])){
+                global $errormessage;
+                $errormessage='A user with this e-mail address already exists in the system.';
+                global $editdata;
+                $editdata=$data;
+                
+                }
+                if($errormessage == ""){
+                    $data['password_md5']=md5($data['new_password']);
+                    $creation_date=time();
+
+                    $data['first_name']=sanitize($data['first_name']);
+                    $data['last_name']=sanitize($data['last_name']);
+                    $data['company_name']=sanitize($data['company_name']);
+                    $data['phone_number']=sanitize($data['phone_number']);
+                    $data["website"] = sanitize($data["website"]);
+                    $data['fax_number']= "";
+                    $data['company_address']=sanitize($data['company_address']);
+                    $data['company_city']=sanitize($data['company_city']);
+                    $data['company_state']=sanitize($data['company_state']);
+                    $data['company_zip']=sanitize($data['company_zip']);
+                    $data['company_country']=sanitize($data['company_country']);
+                    $data['tax_id']="";//sanitize($data['tax_id']);
+                    $data['account_type']=sanitize($data['account_type']);
+                    $data['paypal_id']="";//sanitize($data['paypal_id']);
+                
+                    global $maindb;
+                    $sql = "INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,paypal_id,website)
+                    VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date','$data[paypal_id]','$data[website]')";
+                    mysql_query($sql, $maindb);
+                    global $created_user_id;
+                    $created_user_id=mysql_insert_id($maindb);
+
+                    //redirect to singin page.
+                    echo '<META HTTP-EQUIV="Refresh" Content="0; URL=signin.php">';exit;
+                }
+                //create_rightset('user', $created_user_id, $data);
+
+            /*if (do_create('user', $_POST, '')){
+                global $added;
+                $added=1;
+                MAD_Admin_Redirect::redirect('user_management.php?added=1');
+            }else{
+                global $added;
+                $added=2;
+            }*/
+        }else{
+            
+        }
+    ?>
+    <div id="content">
+        <div id="contentHeader">
+            <h1>Add User</h1>
+        </div>
+        <div class="container">
+            <div class="grid-24">
+                <?php if (isset($errormessage)){ ?>
+                    <div class="box plain"><div class="notify notify-error"><h3>Error</h3><p><?php echo $errormessage; ?></p></div> <!-- .notify --></div>
+                <?php } ?>
+                <form method="post" id="cruduser" name="cruduser" class="form uniformForm">
+                    <input type="hidden" name="add" value="1" />
+                    <?php
 
 function country_code_to_country( $code ){
     $country = '';
@@ -284,16 +413,7 @@ function country_code_to_country( $code ){
 							</div> <!-- .field-group -->
                             
                              
-                            <div class="field-group">
-			
-								<div class="field">
-								<select id="account_type" name="account_type">
-                                <option value="undefined">- No Group -</option>
-								  <?php if (!isset($editdata['account_type'])){$editdata['account_type']='';} get_group_dropdown($editdata['account_type']); ?>
-							  </select>
-									<label for="account_type"><strong>Group</strong></label>
-								</div>
-							</div> <!-- .field-group -->
+                            
                             
                             
                             <div class="field-group">
@@ -332,8 +452,8 @@ function country_code_to_country( $code ){
                             <div class="field-group">
 			
 								<div class="field">
-									<input type="text" value="<?php if (isset($editdata['fax_number'])){echo $editdata['fax_number']; } ?>" name="fax_number" id="fax_number" size="28" class="" />			
-									<label for="fax_number">Fax Number</label>
+                                                                        <input type="text" value="<?php if (isset($editdata['website'])){echo $editdata['website']; } else{ echo "http://"; } ?>" name="website" id="website" size="28" class="" />			
+									<label for="website">Website</label>
 								</div>
 							</div> <!-- .field-group -->
                             
@@ -611,22 +731,19 @@ function country_code_to_country( $code ){
                             
                             
                             
-                            <div class="field-group">
+                            <!--<div class="field-group">
 			
 								<div class="field">
 									<input type="text" value="<?php if (isset($editdata['tax_id'])){ echo $editdata['tax_id']; } ?>" name="tax_id" id="tax_id" size="28" class="" />			
 									<label for="tax_id">Tax ID</label>
 								</div>
 							</div> <!-- .field-group -->
-                            
-                            <div class="field-group">
-			
-								<div class="field">
-									<input type="text" value="<?php if (isset($editdata['paypal_id'])){ echo $editdata['paypal_id']; } ?>" name="paypal_id" id="paypal_id" size="28" class="" />			
-									<label for="paypal_id">Paypal ID</label>
-								</div>
-							</div> <!-- .field-group -->
-                            
+                             <!--<div class="field-group">
+                                            <div class="field">
+                                                            <input type="text" value="<?php if (isset($editdata['paypay_id'])){ echo $editdata['paypay_id']; } ?>" name="paypal_id" id="paypay_id" size="28" class="" />			
+                                                            <label for="paypal_id">Paypal ID</label>
+                                                    </div>
+                                            </div> <!-- .field-group -->
                            
                          
 						
@@ -635,3 +752,12 @@ function country_code_to_country( $code ){
 					</div> <!-- .widget -->
                     
                     
+                    <div class="actions">
+                        <button type="submit" class="btn btn-quaternary btn-large">Submit</button>
+                    </div> <!-- .actions -->
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

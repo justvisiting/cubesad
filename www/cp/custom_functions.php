@@ -7,151 +7,171 @@
 /* get budget for all Or selected Campaigns*/
 function getBudgetForCampaigns($data){
     //if ($data['report_type']=='campaign'){
-        $sql = "SELECT campaign_id,budget,bid_pricing FROM md_campaigns ";
+        $clickCost = 0;
+        $impressionCost = 0;
+        $totalBudget = 0;
+        $budgetTtl = 0;
+        $sql = "SELECT campaign_id,budget FROM md_campaigns ";
         if(isset($data['reporting_campaign']) && $data['reporting_campaign'] > "0"){
             $sql .= "WHERE campaign_id = {$data['reporting_campaign']}";
         }
         $campaignBudgetArr = array();
         $reult = mysql_query($sql);
         while($budgetArr = mysql_fetch_array($reult)){
+            $budgetTtl += $budgetArr["budget"];
             //print_r($budgetArr);
-            $campaignBudgetArr[$budgetArr["campaign_id"]] = array(
-                "budget" => $budgetArr["budget"],
-                "bidType" => $budgetArr["bid_pricing"]
-                );
+            $campaignBudgetArr[$budgetArr["campaign_id"]] = $budgetArr["budget"];
         }
         // now we have campaings and their budget.
         
-        $sql = "SELECT * FROM md_campaign_view ";
+        $sql2 = "SELECT * FROM md_campaign_view ";
         if($data['reporting_campaign'] > 0){
-            $sql .= "WHERE campaign_id = {$data['reporting_campaign']}";
+            $sql2 .= "WHERE campaign_id = {$data['reporting_campaign']}";
         }
-        $result = mysql_query($sql);
-        $clickCost = 0;
-        $impressionCost = 0;
-        $totalBudget = 0;
-        $bidType = "";
+        $result = mysql_query($sql2);
+        
         $uniqueCamp = array();
+        $countOfTotalClickOrImpression = 0;
         while($view = mysql_fetch_array($result)){
+            $countOfTotalClickOrImpression++;
             if(!in_array($view["campaign_id"], $uniqueCamp)){
-                $totalBudget += $campaignBudgetArr[$view["campaign_id"]]["budget"];
-                $bidType = $campaignBudgetArr[$view["campaign_id"]]["bidType"];
+                $totalBudget += $campaignBudgetArr[$view["campaign_id"]];
                 $uniqueCamp[] = $view["campaign_id"];
             }
-            if($bidType == $view["is_impression"] && $view["is_impression"] == 1){
+            //means its an impression
+            if($view["is_impression"] == 1){
                 $impressionCost += ($view["debit"]/1000);
-            }
-            if($bidType == $view["is_impression"] && $view["is_impression"] == 2){
+            }else if($view["is_impression"] == 2){
+                //means its a click.
                 $clickCost += $view["debit"];
             }
+        }
+        // when there is no click or impression then on ad
+        // total balance will be calculated like this.
+        if($countOfTotalClickOrImpression==0){
+            $totalBudget = $budgetTtl;
         }
         $remain = (float) $totalBudget-($impressionCost+$clickCost);
         return $remain;
     //}
 }
+        //get earnings for all or selected publisher
 function getEarningFromCampaign($data){
-        $sql = "SELECT campaign_id,bid_pricing FROM md_campaigns ";
-        $campaignBudgetArr = array();
-        $reult = mysql_query($sql);
-        while($budgetArr = mysql_fetch_array($reult)){
-            //print_r($budgetArr);
-            $campaignBudgetArr[$budgetArr["campaign_id"]] = array(
-                "bidType" => $budgetArr["bid_pricing"]
-                );
+    $sql = "SELECT * FROM md_campaign_view ";
+    if($data['reporting_publication'] > 0){
+        $sql .= "WHERE publication_id = {$data['reporting_publication']}";
+    }
+    $result = mysql_query($sql);
+    $clickCost = 0;
+    $impressionCost = 0;
+    while($view = mysql_fetch_array($result)){
+        //means its an impression
+        if($view["is_impression"] == 1){
+            $impressionCost += ($view["debit"]/1000);
+        }else if($view["is_impression"] == 2){
+            //means its a click.
+            $clickCost += $view["debit"];
         }
-        // now we have campaings and their budget.
-        
-    //if ($data['report_type']=='publication'){        
-        $sql = "SELECT * FROM md_campaign_view ";
-        if($data['reporting_publication'] > 0){
-            $sql .= "WHERE publication_id = {$data['reporting_publication']}";
+    }
+    $earning = (float) ($impressionCost+$clickCost);
+    return $earning;
+}
+
+
+function insertDeviceTargeting($targetDevices,$campaignId,$dbLink,$data){
+    // delete old records from md_device_targeting because 
+    // count of selected target device may be different
+    // thats why we delete the old records and add the new selected devices [rather than update each device each time.]
+    $sql = "DELETE FROM md_device_targeting WHERE campaign_id = $campaignId";
+    mysql_query($sql,$dbLink);
+    if(count($targetDevices) > 0){
+    // Insert device to campaigns
+        $sql = "INSERT INTO md_device_targeting (campaign_id,device_id,max,min) VALUES ";
+        $comma = "";
+        foreach($targetDevices as $td){
+            $min = isset($data["version_min$td"]) && strlen(trim($data["version_min$td"])) > 0 ? trim($data["version_min$td"]) : 0;
+            $max = isset($data["version_max$td"])  && strlen(trim($data["version_max$td"])) > 0 ? trim($data["version_max$td"]) : 0;
+            $sql .= $comma . "($campaignId,$td,$max,$min)";
+            $comma = ",";
         }
-        $result = mysql_query($sql);
-        $clickCost = 0;
-        $impressionCost = 0;
-        //$uniqueCamp = array();
+        //echo $sql;
+        mysql_query($sql, $dbLink);
+    }
+}
+
+function insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$dblink){
+    $qry = "SELECT max_pricing,campaign_owner,bid_type FROM md_campaigns WHERE campaign_id = $campaign_id";
+    $result = mysql_query($qry,$dblink);
+    if(!$result){
+        die("db error");
+    }
+    $row = mysql_fetch_row($result);
+    $debit = $row[0];
+    $advertiser_id = $row[1];
+    $bidType = 0;
+    if($row[2]== 1 && $add_impression == 1){
+        $bidType = 1;
+        $sql = "INSERT INTO md_campaign_view (timestamp, is_impression, debit, advertiser_id,publication_id,campaign_id) VALUES($current_timestamp,$bidType,$debit,$advertiser_id,$publication_id,$campaign_id)";
+        mysql_query($sql,$dblink);
+    }else if($row[2] == 2 && $add_click == 1){
+        $bidType = 2;
+        $sql = "INSERT INTO md_campaign_view (timestamp, is_impression, debit, advertiser_id,publication_id,campaign_id) VALUES($current_timestamp,$bidType,$debit,$advertiser_id,$publication_id,$campaign_id)";
+        mysql_query($sql,$dblink);
+    }
+    
+}
+// check for duplicate publication email id on add,edit.
+// for edit we pass $pubId.
+function pub_isDuplicateEmail($email,$dblink,$pubId=""){
+    $sql = "SELECT inv_id FROM md_publications WHERE email_address = '$email'";
+    if(strlen($pubId) > 0 ){
+        $sql .= " AND inv_id NOT IN($pubId)";
+    }
+    $result = mysql_query($sql,$dblink);
+    $count = 0;
+    if(!$result){
+        die("db error");
+    }else{
         while($view = mysql_fetch_array($result)){
-            $bidType = $campaignBudgetArr[$view["campaign_id"]]["bidType"];
-            if($bidType == $view["is_impression"] && $view["is_impression"] == 1){
-                $impressionCost += ($view["debit"]/1000);
-            }
-            if($bidType == $view["is_impression"] && $view["is_impression"] == 2){
-                $clickCost += $view["debit"];
-            }
-        }
-        $earning = (float) ($impressionCost+$clickCost);
-        return $earning;
-    //}
-}
-        //get Budget for Campaign.
-
-        /*
-
-        //get all ad hits related to campaigns.
-        $sql = "SELECT campaign_id,time_stamp,total_impressions,total_clicks FROM md_reporting ". get_rep_limitation_query($data).' '.get_rep_date_query($data).' ';
-        $result = mysql_query($sql);
-        $clickCost = 0;
-        $impressionCost = 0;
-        while($report = mysql_fetch_array($result)){
-            $budget = $campaignBudgetArr[$report["campaign_id"]];
-            $bidPrice = getBidPriceDuringThatTime($report["campaign_id"],$report["time_stamp"]);
-            if($report["total_clicks"] == 1){
-                $clickCost += $bidPrice;
-            }if($report["total_impressions"] == 1){
-                $impressionCost += ($bidPrice/1000);
-            }
-            // get comapign bids during perticular time period
-            /*$sql = "SELECT campaign_id,bid_pricing,max_pricing,creation_date FROM md_campaign_bid WHERE campaign_id = {$report["campaign_id"]} ORDER BY creation_date ASC";
-            $rslt = mysql_query($sql);
-            $campaign_bids = mysql_fetch_array($rslt);
-            $clickCost = 0;
-            $impressionCost = 0;
-            for($i=0;$i < count($campaign_bids);$i++){
-                $compaign_bid = $campaign_bids[$i];
-                $campaign_start_date = $campaign_bid["creation_date"];
-                $campaign_end_date = isset($campaign_bids[$i]["creation_date"]) ?  $campaign_bids[$i]["creation_date"] : time();
-                if($campaign_start_date < $report["time_stamp"] && $campaign_end_date > $report["time_stamp"]){
-                    if($compaign_bid["bid_pricing"] == "1"){
-                        $clickCost += $compaign_bid["max_pricing"];
-                    }else if($compaign_bid["bid_pricing"] == "2"){
-                        $impressionCost += ($compaign_bid["max_pricing"]/1000);
-                    }
-                }
-            }*/
-
-                /*$camp_bid_time_relation["campaign_id"] = array(
-                        "pricing_type" => $campaign_bids[$i]["bid_pricing"],
-                        "bidprice" => $campaign_bids[$i]["max_pricing"],
-                        "bidstarttime" => $campaign_bids[$i]["creation_date"],
-                        "bidendtime" => isset($campaign_bids[$i+1]["creation_date"]) ? $campaign_bids[$i+1]["creation_date"] : time()
-                );
-                /*$camp_bid_time_relation["campaign_id"] = $campaign_bids[$i]["campaign_id"];
-                $camp_bid_time_relation["pricing_type"] = $campaign_bids[$i]["bid_pricing"];
-                $camp_bid_time_relation["bidprice"] = $campaign_bids[$i]["max_pricing"];
-                $camp_bid_time_relation["bidstarttime"] = $campaign_bids[$i]["creation_date"];
-                if(isset($campaign_bids[$i+1]["creation_date"])){
-                    $camp_bid_time_relation["bidendtime"] = $campaign_bids[$i+1]["creation_date"];
-                }else{
-                    $camp_bid_time_relation["bidendtime"] = time();
-                }*/
-        /*}
-        //echo $budget - $clickCost - $impressionCost;
+            $count++;
+            break;
+        }   
     }
+    return $count == 0 ? false : true;
 }
-function getBidPriceDuringThatTime($campId,$timeStamp){
-    $sql = "SELECT campaign_id,max_pricing,creation_date FROM md_campaign_bid WHERE campaign_id = {$campId} ORDER BY creation_date ASC";
-    $rslt = mysql_query($sql);
-    $campaign_bids = array();
-    while($camp =  mysql_fetch_array($rslt)){
-        $campaign_bids[] = $camp;
+
+function pub_login($username,$password){    	
+    global $maindb;
+    $username = mysql_real_escape_string(stripslashes($username));
+    $password = mysql_real_escape_string(stripslashes($password));
+    $username=strtolower($username);
+    if (logincheck()){
+        return true;
     }
-    for($i=0;$i < count($campaign_bids);$i++){
-        $starttime = $campaign_bids[$i]["creation_date"];
-        $endtime = isset($campaign_bids[$i+1]["creation_date"]) ? $campaign_bids[$i+1]["creation_date"] : time();
-        if($starttime < $timeStamp && $endtime > $timeStamp){
-            return $campaign_bids[$i]["max_pricing"];
-        } 
+    $resultu=mysql_query("select * from md_publications where email_address='$username'", $maindb);
+    $usert1=mysql_fetch_array($resultu);
+
+
+
+    $username_db = $usert1['email_address'];
+    $password_db = $usert1['pass_word'];
+    //$account_status = $usert1['account_status'];
+
+    $login_username=$username;
+    $login_password=md5($password);
+
+    $code_p = uniqid ($username, true); // GENERATE SESSION ID
+    $sessid = md5($code_p);
+
+
+    if ($username_db==$login_username && $login_password==$password_db){
+        //if ($account_status=="1"){
+            $date_n        = mktime(date("G"), date("i"), date("s"), date("m")  , date("d")+100, date("Y")); // Generate date
+            mysql_query("INSERT INTO `md_usessions` VALUES('', '$sessid', '$date_n', '1', '$username', '$login_password', '1', '', '".time()."')", $maindb);
+            $inTwoMonths = 60 * 60 * 24 * 60 + time();
+            setcookie('md_loginsession', $sessid, $inTwoMonths); 
+            return true;
+        //}
     }
-    return 0;
+    return false;
 }
-*/

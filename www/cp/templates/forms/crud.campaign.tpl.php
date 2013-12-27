@@ -250,11 +250,11 @@ function checkAll(theForm, cName, status) {
 							</div> <!-- .field-group -->
                                                         <div class="field-group">
                                                             <div class="field">
-                                                                    <label for="textfield">Budget</label>
+                                                                    <label for="textfield">Budget per day</label>
                                                                     <input size="10" type="text" value="<?php if (isset($editdata['budget'])){ echo $editdata['budget']; } ?>" name="budget" id="budget" />
                                                             </div>
                                                             <div class="field">
-                                                                    <label for="textfield">Bidding price</label>
+                                                                    <label for="textfield">Bidding Type</label>
                                                                     <select id="cap_type" name="bid_pricing" onchange="changeText(this)" onclick="changeText(this)">
                                                                         <option <?php if (isset($editdata['bid_pricing']) && $editdata['bid_pricing']==1){echo 'selected="selected"'; } ?> value="1">Impression based</option>
                                                                         <option <?php if (isset($editdata['bid_pricing']) && $editdata['bid_pricing']==2){echo 'selected="selected"'; } ?> value="2">Clicked based</option>

@@ -338,7 +338,7 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_campaigns` (
   `channel_target` varchar(1) NOT NULL,
   `device_target` varchar(1) NOT NULL,
   `budget` float NOT NULL DEFAULT '0',
-  `bid_pricing` int(1) NOT NULL COMMENT '1.Impression based (internal name CPC) 2. Clicked based (internal name CPM)',
+  `bid_type` int(1) NOT NULL COMMENT '1.Impression based (internal name CPM) 2. Clicked based (internal name CPC)',
   `max_pricing` float NOT NULL DEFAULT '0',
   PRIMARY KEY  (`campaign_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
@@ -482,7 +482,8 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_pending_actions` (
   `action_detail` longtext NOT NULL,
   PRIMARY KEY  (`entry_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
-mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
+
+/*mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
   `inv_id` int(11) NOT NULL auto_increment,
   `creator_id` varchar(100) NOT NULL,
   `inv_status` varchar(100) NOT NULL,
@@ -494,6 +495,27 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
   `md_lastrequest` varchar(100) NOT NULL,
   PRIMARY KEY  (`inv_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
+*/
+
+// added new fields email_address,pass_word,paypal_id,amount_paid
+
+mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
+  `inv_id` int(11) NOT NULL AUTO_INCREMENT,
+  `creator_id` varchar(100) NOT NULL,
+  `inv_status` varchar(100) NOT NULL,
+  `inv_type` varchar(100) NOT NULL,
+  `inv_name` varchar(100) NOT NULL,
+  `inv_description` varchar(100) NOT NULL,
+  `inv_address` varchar(100) NOT NULL,
+  `inv_defaultchannel` varchar(100) NOT NULL,
+  `md_lastrequest` varchar(100) NOT NULL,
+  `email_address` varchar(100) NOT NULL,
+  `pass_word` varchar(100) NOT NULL,
+  `paypal_id` varchar(100) NOT NULL,
+  `amount_paid` varchar(10) NOT NULL,
+  PRIMARY KEY (`inv_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;",$maindb);
+
 mysql_query("CREATE TABLE IF NOT EXISTS `md_publication_types` (
   `entry_id` int(11) NOT NULL auto_increment,
   `pub_identification` varchar(100) NOT NULL,
@@ -4922,7 +4944,8 @@ mysql_query("INSERT INTO `md_regional_targeting` (`entry_id`, `targeting_code`, 
 (8518, 'ZW_08', 'REGION', '08', 'Masvingo', 'ZW', '', '', '1'),
 (8519, 'ZW_09', 'REGION', '09', 'Bulawayo', 'ZW', '', '', '1'),
 (8520, 'ZW_10', 'REGION', '10', 'Harare', 'ZW', '', '', '1');", $maindb);
-mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
+
+/*mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
   `entry_id` int(11) NOT NULL auto_increment,
   `type` varchar(100) NOT NULL,
   `time_stamp` varchar(100) NOT NULL,
@@ -4942,7 +4965,30 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
   `total_cost` varchar(100) NOT NULL,
   PRIMARY KEY  (`entry_id`),
   UNIQUE KEY `reporting_select` (`publication_id`(6),`zone_id`(6),`campaign_id`(6),`creative_id`(6),`network_id`(6),`date`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);*/
+
+//removed the unique key constraint from the below table.
+mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
+  `entry_id` int(11) NOT NULL auto_increment,
+  `type` varchar(100) NOT NULL,
+  `time_stamp` varchar(100) NOT NULL,
+  `date` date NOT NULL,
+  `day` varchar(100) NOT NULL,
+  `month` varchar(100) NOT NULL,
+  `year` varchar(100) NOT NULL,
+  `publication_id` varchar(100) NOT NULL,
+  `zone_id` varchar(100) NOT NULL,
+  `campaign_id` varchar(100) NOT NULL,
+  `creative_id` varchar(100) NOT NULL,
+  `network_id` varchar(100) NOT NULL,
+  `total_requests` varchar(100) NOT NULL,
+  `total_requests_sec` varchar(100) NOT NULL,
+  `total_impressions` varchar(100) NOT NULL,
+  `total_clicks` varchar(100) NOT NULL,
+  `total_cost` varchar(100) NOT NULL,
+  PRIMARY KEY  (`entry_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
+
 mysql_query("CREATE TABLE IF NOT EXISTS `md_syslog` (
   `entry_id` int(11) NOT NULL auto_increment,
   `log_type` varchar(100) NOT NULL,
@@ -4987,7 +5033,8 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_trafficrequests_parameters` (
   `parameter_value` varchar(100) NOT NULL,
   PRIMARY KEY  (`entry_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
-mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
+
+/*mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
   `user_id` int(11) NOT NULL auto_increment,
   `email_address` varchar(100) NOT NULL,
   `pass_word` varchar(100) NOT NULL,
@@ -5010,6 +5057,37 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
   PRIMARY KEY  (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 ", $maindb);
+ * 
+ */
+
+// added new fields : paypal_id,amount_paid,website
+mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
+  `user_id` int(11) NOT NULL auto_increment,
+  `email_address` varchar(100) NOT NULL,
+  `pass_word` varchar(100) NOT NULL,
+  `account_status` char(1) NOT NULL,
+  `account_type` varchar(100) NOT NULL,
+  `company_name` varchar(100) NOT NULL,
+  `first_name` varchar(100) NOT NULL,
+  `last_name` varchar(100) NOT NULL,
+  `gender` varchar(100) NOT NULL,
+  `phone_number` varchar(100) NOT NULL,
+  `fax_number` varchar(100) NOT NULL,
+  `company_address` varchar(100) NOT NULL,
+  `company_city` varchar(100) NOT NULL,
+  `company_state` varchar(100) NOT NULL,
+  `company_zip` varchar(100) NOT NULL,
+  `company_country` varchar(100) NOT NULL,
+  `tax_id` varchar(100) NOT NULL,
+  `tooltip_setting` varchar(1) NOT NULL,
+  `creation_date` varchar(100) NOT NULL,
+  `paypal_id` varchar(100) NULL,
+  `amount_paid` varchar(10) NULL,
+  `website` varchar(100) NULL,
+  PRIMARY KEY  (`user_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+", $maindb);
+
 mysql_query("CREATE TABLE IF NOT EXISTS `md_user_groups` (
   `entry_id` int(11) NOT NULL auto_increment,
   `group_name` varchar(100) NOT NULL,
@@ -5085,16 +5163,6 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_device` "
         . ")",$maindb);
 mysql_query("INSERT INTO `md_device` (`device_id`,`device_name`) VALUES(NULL,'IPhone'),"
                                                                 . "(NULL,'Android')",$maindb);
-
-//created by Nitesh.
-mysql_query("CREATE TABLE IF NOT EXISTS `md_device_targeting` "
-        . "("
-            . "`id` int(11) NOT NULL auto_increment,"
-            . "`campaign_id` int(11) NULL,"
-            . "`device_id` int(11) NULL,"
-            . "PRIMARY KEY  (`id`)"
-        . ")",$maindb);
-
 mysql_query("CREATE TABLE IF NOT EXISTS `md_device_targeting` "
         . "("
             . "`id` int(11) NOT NULL auto_increment,"
@@ -5105,20 +5173,12 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_device_targeting` "
             . "PRIMARY KEY  (`id`)"
         . ")",$maindb);
 
-mysql_query("CREATE TABLE IF NOT EXISTS `md_campaign_bid` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `campaign_id` int(11) NOT NULL,
-  `bid_pricing` int(1) NOT NULL COMMENT '1.Impression based (internal name CPC) 2. Clicked based (internal name CPM)',
-  `max_pricing` float NOT NULL DEFAULT '0',
-  `creation_date` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;",$maindb);
 
 mysql_query("CREATE TABLE IF NOT EXISTS `md_campaign_view` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `timestamp` varchar(100) DEFAULT NULL,
-  `is_impression` int(1) NOT NULL DEFAULT '0',
-  `debit` float NOT NULL DEFAULT '0',
+  `is_impression` int(1) NOT NULL DEFAULT '0' COMMENT '1.Impression based (internal name CPM) 2. Clicked based (internal name CPC)',
+  `debit` float NOT NULL DEFAULT '0' COMMENT 'Here we put max_pricing from md_campaigns which indicate the amount ,going to debit from advertiser amount for particular ad and ad type which advertiser selected while making campaigns.',
   `advertiser_id` int(11) NOT NULL,
   `publication_id` int(11) NOT NULL,
   `campaign_id` int(11) NOT NULL,

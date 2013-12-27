@@ -42,15 +42,45 @@
 								</div>
 							</div> <!-- .field-group -->
                             
-                            <div class="field-group">
-			
-								<div class="field">
-									<select id="inv_defaultchannel" name="inv_defaultchannel">
-								  <option>- Select Channel  -</option>
-<?php  if (!isset($editdata['inv_defaultchannel'])){$editdata['inv_defaultchannel']='';} get_channel_dropdown($editdata['inv_defaultchannel']); ?>								</select>					
-									<label for="inv_defaultchannel">Main Channel</label>
-								</div>
-							</div> <!-- .field-group -->
+                                                        <div class="field-group">
+
+                                                            <div class="field">
+                                                                    <select id="inv_defaultchannel" name="inv_defaultchannel">
+                                                              <option>- Select Channel  -</option>
+                                                                    <?php  if (!isset($editdata['inv_defaultchannel'])){$editdata['inv_defaultchannel']='';} get_channel_dropdown($editdata['inv_defaultchannel']); ?>								</select>					
+                                                                    <label for="inv_defaultchannel">Main Channel</label>
+                                                            </div>
+                                                        </div> <!-- .field-group -->
+                                                        <!--custome fields -->
+                                                        
+                                                        <div class="field-group">
+                                                            <div class="field">
+                                                                    <input type="text" value="<?php if (isset($editdata['email_address'])){ echo $editdata['email_address']; } ?>"  name="email_address" id="email_address" size="28" class="" />
+                                                                    <label for="email_address">Email Address</label>
+                                                            </div>
+                                                        </div> <!-- .field-group -->
+                                                        
+                                                        <div class="field-group">
+                                                            <div class="field">
+                                                                <input type="password" value=""  name="pass_word" id="pass_word" size="28" class="" />
+                                                                <label for="pass_word">Password</label>
+                                                            </div>
+                                                        </div> <!-- .field-group -->
+                                                        
+                                                        <div class="field-group">
+                                                            <div class="field">
+                                                                <input type="password" value=""  name="confirm_pass_word" id="confirm_pass_word" size="28" class="" />
+                                                                <label for="confirm_pass_word">Confirm Password</label>
+                                                            </div>
+                                                        </div> <!-- .field-group -->
+                                                        
+                                                        <div class="field-group">
+                                                            <div class="field">
+                                                                <input type="text" value="<?php if (isset($editdata['paypal_id'])){ echo $editdata['paypal_id']; } ?>"  name="paypal_id" id="paypal_id" size="28" class="" />
+                                                                <label for="paypal_id">Paypal ID</label>
+                                                            </div>
+                                                        </div> <!-- .field-group -->
+                                                        <!--end custome fields-->
                             
                             <div class="field-group">
 			
