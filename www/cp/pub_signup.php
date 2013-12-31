@@ -38,7 +38,7 @@ header("Pragma: no-cache");
         // Required files
         require_once MAD_PATH . '/www/cp/auth.php';
         require_once MAD_PATH . '/functions/adminredirect.php';
-        require_once MAD_PATH . '/www/cp/restricted.php';
+        //require_once MAD_PATH . '/www/cp/restricted.php';
         require_once MAD_PATH . '/www/cp/admin_functions.php';
         global $current_action;
         $current_action = 'create';
@@ -51,7 +51,7 @@ header("Pragma: no-cache");
                     if (do_create('publication', $_POST, '')){
                         global $added;
                         $added=1;
-                         echo '<META HTTP-EQUIV="Refresh" Content="0; URL=signin.php">';exit;
+                         echo '<META HTTP-EQUIV="Refresh" Content="0; URL=thanks.php">';exit;
                     }else{
                         global $added;
                         $added=2;

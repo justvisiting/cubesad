@@ -179,20 +179,7 @@ $current_month=date("m");
 $current_year=date("Y");
 $current_timestamp=time();
 
-// edit by raj
-// manage new row for each hrs in reporting.
-//$current_timestamp = strtotime(date("Y-m-d H:i:s"));
-$current_minutes_secs = date("i") * 60 + date("s");
-$current_hour_timestamp = $current_timestamp - $current_minutes_secs;
-$next_hour_timestamp = $current_hour_timestamp + 3600;
-//echo date("Y-m-d H:i:s"). "<br/>";
-//echo date("Y-m-d H:i:s",$current_hour_timestamp) . "<br/>";;
-//echo date("Y-m-d H:i:s",$next_hour_timestamp) . "<br/>";;
-//echo date("h:i:s");
-//$current_hour_timestamp = strtotime(date("Y-m-d H"));
-//$next_hour_timestamp = $current_timestamp + 3600;
-
-$select_query="select entry_id from md_reporting where publication_id='".$publication_id."' AND zone_id='".$zone_id."' AND campaign_id='".$campaign_id."' AND creative_id='".$creative_id."' AND network_id='".$network_id."' AND time_stamp BETWEEN $current_hour_timestamp AND $next_hour_timestamp LIMIT 1";
+$select_query="select entry_id from md_reporting where publication_id='".$publication_id."' AND zone_id='".$zone_id."' AND campaign_id='".$campaign_id."' AND creative_id='".$creative_id."' AND network_id='".$network_id."' AND date='".$current_date."' LIMIT 1";
 //echo $select_query;
 global $repdb_connected;
 

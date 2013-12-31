@@ -40,7 +40,13 @@ require_once MAD_PATH . '/www/cp/templates/header.tpl.php';
 							Today - Server Statistics
 							<span>All Metrics are displayed in Real Time</span></h2>				
 						<?php
-						$reportingdata_main=get_reporting_data("publisher", $today_day, $today_month, $today_year, '');
+                                                    global $user_detail;
+                                                    global $user_right;
+                                                    if(isset($user_right["publisher"])){
+                                                        $reportingdata_main=get_reporting_data("publisher", $today_day, $today_month, $today_year, $user_detail["inv_id"]);
+                                                    }else{
+                                                        $reportingdata_main=get_reporting_data("publisher", $today_day, $today_month, $today_year, '');
+                                                    }
 						?>
 						<div class="dashboard_report first activeState">
 							<div class="pad">
@@ -59,7 +65,13 @@ require_once MAD_PATH . '/www/cp/templates/header.tpl.php';
 								<span class="value"><?php echo number_format($reportingdata_main['total_clicks']); ?></span> Clicks
 							</div> <!-- .pad -->
 						</div>
-						
+						<?php
+                                                    /*if(isset($user_right["publisher"])){
+                                                        
+                                                    }else{
+                                                        
+                                                    }*/
+                                                ?>
 						<div class="dashboard_report defaultState last">
 							<div class="pad">
 								<span class="value"><?php echo $reportingdata_main['ctr']; ?>%</span> CTR
@@ -132,6 +144,7 @@ require_once MAD_PATH . '/www/cp/templates/header.tpl.php';
 				</ul> -->
 </div> 
 <?php } ?>
+                
 
 		<a href="../../<?php echo MAD_IOS_SDK_LOCATION; ?>" class="btn btn-primary btn-large dashboard_add">Download iOS SDK</a>
 					<a href="../../<?php echo MAD_ANDROID_SDK_LOCATION; ?>" class="btn btn-quaternary btn-large dashboard_add">Download Android SDK</a>

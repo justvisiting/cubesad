@@ -175,3 +175,21 @@ function pub_login($username,$password){
     }
     return false;
 }
+function setPublisherSession(){
+    if(isset($_COOKIE["md_loginsession"])){
+        $sessionId = $_COOKIE["md_loginsession"];
+        $sql = "SELECT user_identification FROM md_usessions WHERE session_id = '$sessionId' AND session_status = 1";
+        $result = mysql_query($sql);
+        $userExists = false;
+        $email = NULL;
+        while($row = mysql_fetch_array($result)){
+            $email = $row["user_identification"];
+        }
+        if($email != NULL){
+            $sql = "SELECT inv_name,email_address FROM md_publications WHERE email_address = '$email'";
+            $result = mysql_query($sql);
+            global $user_detail;
+            $user_detail = mysql_fetch_array($result);
+        }
+    }
+}

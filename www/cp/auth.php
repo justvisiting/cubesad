@@ -23,7 +23,7 @@ function logincheck(){
             $resulty=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
             $userv=mysql_fetch_array($resulty);
             
-            if(count($userv) > 0){
+            if(is_array($userv) && count($userv) > 0){
                 // Login user is advertiser or administrator
             }else{
                 // Login user is publisher
@@ -31,32 +31,44 @@ function logincheck(){
                 $userv=mysql_fetch_array($resulty);
                 $userv["account_status"] = 1;
             }
-            $sespas = $sessiondet['user_password'];
-            if ($sespas==$userv['pass_word'] && $sespas!="" && $userv['account_status']==1){
-                $loggedin_status=1;
-                $new_session_timeout = $date + MAD_USER_SESSION_TIMEOUT;
-                mysql_query("UPDATE md_usessions set session_timeout='$new_session_timeout' WHERE session_status='1' AND session_id='$loginsession_id'", $maindb);
-                global $user_detail;
-                $usresult=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
-                $user_detail=mysql_fetch_array($usresult);
-                
-                if(count($user_detail) > 0){
-                    // for admin and advertiser
-                    if (is_numeric($user_detail['account_type']) && $user_detail['account_type']>1){
+            if(is_array($userv) && count($userv) > 0){
+                // login user can be advertiser,admin or publisher.
+                $sespas = $sessiondet['user_password'];
+                if ($sespas==$userv['pass_word'] && $sespas!="" && $userv['account_status']==1){
+                    $loggedin_status=1;
+                    $new_session_timeout = $date + MAD_USER_SESSION_TIMEOUT;
+                    mysql_query("UPDATE md_usessions set session_timeout='$new_session_timeout' WHERE session_status='1' AND session_id='$loginsession_id'", $maindb);
+                    global $user_detail;
+                    $usresult=mysql_query("select * from md_uaccounts where email_address='$sessiondet[user_identification]'", $maindb);
+                    $user_detail=mysql_fetch_array($usresult);
+
+                    if(is_array($user_detail) && count($user_detail) > 0){
+                        // for admin and advertiser
+                        if (is_numeric($user_detail['account_type']) && $user_detail['account_type']>1){
+                            global $user_right;
+                            $user_right_res=mysql_query("select * from md_user_rights where group_id='$user_detail[account_type]'", $maindb);
+                            $user_right=mysql_fetch_array($user_right_res); 
+                        }else if (!is_numeric($user_detail['account_type'])){
+                            global $user_right;
+                            $user_right_res=mysql_query("select * from md_user_rights where user_id='$user_detail[user_id]'", $maindb);
+                            $user_right=mysql_fetch_array($user_right_res); 
+                        }
+                    }else{
+                        // for publisher
+                        global  $user_detail;
+                        $pub_result = mysql_query("SELECT inv_id,inv_name,inv_status,inv_type,inv_description,inv_address,inv_defaultchannel,md_lastrequest,email_address,paypal_id,amount_paid FROM md_publications WHERE email_address= '$sessiondet[user_identification]'",$maindb);
+                        $user_detail = mysql_fetch_array($pub_result);
                         global $user_right;
-                        $user_right_res=mysql_query("select * from md_user_rights where group_id='$user_detail[account_type]'", $maindb);
-                        $user_right=mysql_fetch_array($user_right_res); 
-                    }else if (!is_numeric($user_detail['account_type'])){
-                        global $user_right;
-                        $user_right_res=mysql_query("select * from md_user_rights where user_id='$user_detail[user_id]'", $maindb);
-                        $user_right=mysql_fetch_array($user_right_res); 
+                         $user_right =  array(
+                             "publisher" => TRUE,
+                         );
                     }
-                }else{
-                    global $user_right;
-                    // for publisher
+                    return true;
                 }
-                return true;
+            }else{
+                // login user neither adv or admin nor publisher.
             }
+            
         }
     }
     return false;		
@@ -229,7 +241,12 @@ function check_permission_simple($key, $user_id){
 
 global $user_right;
 $u_det=get_user_detail($user_id);
-
+/* edit by raj */
+if(!is_array($u_det) || (is_array($u_det) && count($u_det) ==0)){
+    $u_det = array();
+    $u_det['account_type']=1;
+}
+/* edit by raj */
 if ($u_det['account_type']==1){
 return true;	
 }

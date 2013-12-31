@@ -459,8 +459,9 @@ $data['company_state']=sanitize($data['company_state']);
 $data['company_zip']=sanitize($data['company_zip']);
 $data['company_country']=sanitize($data['company_country']);
 $data['tax_id']=sanitize($data['tax_id']);
+$data["website"] = sanitize($data["website"]);
 
-mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' where user_id='$user_id'", $maindb);
+mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' , website='$data[website]' where user_id='$user_id'", $maindb);
 
 return true;
 
@@ -1300,34 +1301,44 @@ echo '<option '.$selected_html.' value="'.$network_detail['entry_id'].'">'.$netw
 
 function get_publication_dropdown($selected){
 global $maindb;	
+global $user_right;
+global $user_detail;
+if(isset($user_right["publisher"])){
+    $str .= "<option selected value = '$user_detail[inv_id]'>$user_detail[inv_name]</option>";
+    echo $str;
+}else{
+    echo "<option value=''>- Select Publication -</option>";
 
-echo "<option value=''>- Select Publication -</option>";
+    $usrres=mysql_query("select * from md_publications ORDER BY inv_id DESC", $maindb);
+    while($publication_detail=mysql_fetch_array($usrres)){
+    $selected_html='';
+    if (is_numeric($selected) && $selected==$publication_detail['inv_id']){
+    $selected_html='selected="selected"';	
+    }
+    echo '<option '.$selected_html.' value="'.$publication_detail['inv_id'].'">'.$publication_detail['inv_name'].'</option>';
+    }
 
-$usrres=mysql_query("select * from md_publications ORDER BY inv_id DESC", $maindb);
-while($publication_detail=mysql_fetch_array($usrres)){
-$selected_html='';
-if (is_numeric($selected) && $selected==$publication_detail['inv_id']){
-$selected_html='selected="selected"';	
 }
-echo '<option '.$selected_html.' value="'.$publication_detail['inv_id'].'">'.$publication_detail['inv_name'].'</option>';
-}
-
-
 }
 
 function get_publication_dropdown_report($selected){
 global $maindb;	
+global $user_right;
+global $user_detail;
+if(isset($user_right["publisher"])){
+    $str .= "<option selected value = '$user_detail[inv_id]'>$user_detail[inv_name]</option>";
+    echo $str;
+}else{
+    $usrres=mysql_query("select * from md_publications ORDER BY inv_name ASC", $maindb);
+    while($publication_detail=mysql_fetch_array($usrres)){
+    $selected_html='';
+    if (is_numeric($selected) && $selected==$publication_detail['inv_id']){
+    $selected_html='selected="selected"';
+    }
+    echo '<option '.$selected_html.' value="'.$publication_detail['inv_id'].'">'.$publication_detail['inv_name'].'</option>';
+    }
 
-$usrres=mysql_query("select * from md_publications ORDER BY inv_name ASC", $maindb);
-while($publication_detail=mysql_fetch_array($usrres)){
-$selected_html='';
-if (is_numeric($selected) && $selected==$publication_detail['inv_id']){
-$selected_html='selected="selected"';	
 }
-echo '<option '.$selected_html.' value="'.$publication_detail['inv_id'].'">'.$publication_detail['inv_name'].'</option>';
-}
-
-
 }
 
 function get_priority_dropdown($selected){
@@ -1961,9 +1972,9 @@ $data['company_state']=sanitize($data['company_state']);
 $data['company_zip']=sanitize($data['company_zip']);
 $data['company_country']=sanitize($data['company_country']);
 $data['tax_id']=sanitize($data['tax_id']);
-$data["paypal_id"] = sanitize($data['paypal_id']);
+$data["website"] = sanitize($data["website"]);
 
-mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', account_type='$data[account_type]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' , paypal_id = '$data[paypal_id]' where user_id='$detail'", $maindb);
+mysql_query("UPDATE md_uaccounts set first_name='$data[first_name]', last_name='$data[last_name]', email_address='$data[email_address]', account_type='$data[account_type]', company_name='$data[company_name]', phone_number='$data[phone_number]', fax_number='$data[fax_number]', company_address='$data[company_address]', company_city='$data[company_city]', company_state='$data[company_state]', company_zip='$data[company_zip]', company_country='$data[company_country]', tax_id='$data[tax_id]' , website='$data[website]' where user_id='$detail'", $maindb);
 
 if (!empty($data['new_password'])){
 
@@ -2323,11 +2334,11 @@ $data['company_zip']=sanitize($data['company_zip']);
 $data['company_country']=sanitize($data['company_country']);
 $data['tax_id']=sanitize($data['tax_id']);
 $data['account_type']=sanitize($data['account_type']);
-$data["paypal_id"] = sanitize($data['paypal_id']);
+$data["website"] = sanitize($data["website"]);
 
 global $maindb;
-mysql_query("INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,paypal_id)
-VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date','$data[paypal_id]')", $maindb);
+mysql_query("INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,website)
+VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date' , '$data[website]')", $maindb);
 global $created_user_id;
 $created_user_id=mysql_insert_id($maindb);
 

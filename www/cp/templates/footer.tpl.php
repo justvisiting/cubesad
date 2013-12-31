@@ -1,7 +1,22 @@
 	<div id="topNav">
 		 <ul>
 		 	<li>
-		 		<a href="#menuProfile" class="menu"><?php echo $user_detail['first_name']; ?> <?php echo $user_detail['last_name']; ?> <?php if (!empty($user_detail['company_name'])){echo "($user_detail[company_name])";} ?></a>
+		 		<a href="#menuProfile" class="menu">
+                                <?php
+                                    global $user_detail;
+                                    global $user_right;
+                                    if(isset($user_right["publisher"])){
+                                        echo $user_detail["inv_name"];
+                                    }else{
+                                        echo $user_detail['first_name']; 
+                                ?>
+                                <?php 
+                                        echo $user_detail['last_name'];
+                                ?>
+                                <?php 
+                                        if (!empty($user_detail['company_name'])){echo "($user_detail[company_name])";}
+                                    }
+                                ?></a>
 		 		
 		 		<div id="menuProfile" class="menu-container menu-dropdown">
 					<div class="menu-content">

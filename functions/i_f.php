@@ -4945,7 +4945,7 @@ mysql_query("INSERT INTO `md_regional_targeting` (`entry_id`, `targeting_code`, 
 (8519, 'ZW_09', 'REGION', '09', 'Bulawayo', 'ZW', '', '', '1'),
 (8520, 'ZW_10', 'REGION', '10', 'Harare', 'ZW', '', '', '1');", $maindb);
 
-/*mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
+mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
   `entry_id` int(11) NOT NULL auto_increment,
   `type` varchar(100) NOT NULL,
   `time_stamp` varchar(100) NOT NULL,
@@ -4965,28 +4965,6 @@ mysql_query("INSERT INTO `md_regional_targeting` (`entry_id`, `targeting_code`, 
   `total_cost` varchar(100) NOT NULL,
   PRIMARY KEY  (`entry_id`),
   UNIQUE KEY `reporting_select` (`publication_id`(6),`zone_id`(6),`campaign_id`(6),`creative_id`(6),`network_id`(6),`date`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);*/
-
-//removed the unique key constraint from the below table.
-mysql_query("CREATE TABLE IF NOT EXISTS `md_reporting` (
-  `entry_id` int(11) NOT NULL auto_increment,
-  `type` varchar(100) NOT NULL,
-  `time_stamp` varchar(100) NOT NULL,
-  `date` date NOT NULL,
-  `day` varchar(100) NOT NULL,
-  `month` varchar(100) NOT NULL,
-  `year` varchar(100) NOT NULL,
-  `publication_id` varchar(100) NOT NULL,
-  `zone_id` varchar(100) NOT NULL,
-  `campaign_id` varchar(100) NOT NULL,
-  `creative_id` varchar(100) NOT NULL,
-  `network_id` varchar(100) NOT NULL,
-  `total_requests` varchar(100) NOT NULL,
-  `total_requests_sec` varchar(100) NOT NULL,
-  `total_impressions` varchar(100) NOT NULL,
-  `total_clicks` varchar(100) NOT NULL,
-  `total_cost` varchar(100) NOT NULL,
-  PRIMARY KEY  (`entry_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
 
 mysql_query("CREATE TABLE IF NOT EXISTS `md_syslog` (
@@ -5059,8 +5037,7 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_trafficrequests_parameters` (
 ", $maindb);
  * 
  */
-
-// added new fields : paypal_id,amount_paid,website
+// added field : website 
 mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
   `user_id` int(11) NOT NULL auto_increment,
   `email_address` varchar(100) NOT NULL,
@@ -5081,9 +5058,8 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_uaccounts` (
   `tax_id` varchar(100) NOT NULL,
   `tooltip_setting` varchar(1) NOT NULL,
   `creation_date` varchar(100) NOT NULL,
-  `paypal_id` varchar(100) NULL,
   `amount_paid` varchar(10) NULL,
-  `website` varchar(100) NULL,
+  `website` VARCHAR( 100 ) NULL,
   PRIMARY KEY  (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 ", $maindb);

@@ -127,7 +127,11 @@ header("Pragma: no-cache");
 			</li>
             <?php } ?>
             
-            
+            <?php
+                if(isset($user_right["publisher"])){
+                    include_once 'pub_header.tpl.php';
+                }
+            ?>
             <?php if ($user_detail['account_type']==1 or  ($user_right['configuration']==1)){?>
 			<li id="navInterface" class="nav<?php if ($current_section=="configuration"){echo " active"; } ?>">
 				<span class="icon-cog-alt"></span>

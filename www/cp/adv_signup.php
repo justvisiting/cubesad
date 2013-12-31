@@ -35,7 +35,7 @@ header("Pragma: no-cache");
         // Required files
         require_once MAD_PATH . '/www/cp/auth.php';
         require_once MAD_PATH . '/functions/adminredirect.php';
-        require_once MAD_PATH . '/www/cp/restricted.php';
+        //require_once MAD_PATH . '/www/cp/restricted.php';
         require_once MAD_PATH . '/www/cp/admin_functions.php';
         global $current_action;
         
@@ -81,8 +81,8 @@ header("Pragma: no-cache");
                     $data['last_name']=sanitize($data['last_name']);
                     $data['company_name']=sanitize($data['company_name']);
                     $data['phone_number']=sanitize($data['phone_number']);
-                    $data["website"] = sanitize($data["website"]);
                     $data['fax_number']= "";
+                    $data['website']= sanitize($data["website"]);
                     $data['company_address']=sanitize($data['company_address']);
                     $data['company_city']=sanitize($data['company_city']);
                     $data['company_state']=sanitize($data['company_state']);
@@ -90,17 +90,16 @@ header("Pragma: no-cache");
                     $data['company_country']=sanitize($data['company_country']);
                     $data['tax_id']="";//sanitize($data['tax_id']);
                     $data['account_type']=sanitize($data['account_type']);
-                    $data['paypal_id']="";//sanitize($data['paypal_id']);
-                
+                   
                     global $maindb;
-                    $sql = "INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,paypal_id,website)
-                    VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date','$data[paypal_id]','$data[website]')";
+                    $sql = "INSERT INTO md_uaccounts (email_address, pass_word, account_status, account_type, company_name, first_name, last_name, phone_number, fax_number, company_address, company_city, company_state, company_zip, company_country, tax_id, creation_date,website)
+                    VALUES ('$data[email_address]', '$data[password_md5]', '1', '$data[account_type]', '$data[company_name]', '$data[first_name]', '$data[last_name]', '$data[phone_number]', '$data[fax_number]', '$data[company_address]', '$data[company_city]', '$data[company_state]', '$data[company_zip]', '$data[company_country]', '$data[tax_id]', '$creation_date','$data[website]')";
                     mysql_query($sql, $maindb);
                     global $created_user_id;
                     $created_user_id=mysql_insert_id($maindb);
 
                     //redirect to singin page.
-                    echo '<META HTTP-EQUIV="Refresh" Content="0; URL=signin.php">';exit;
+                    echo '<META HTTP-EQUIV="Refresh" Content="0; URL=thanks.php">';exit;
                 }
                 //create_rightset('user', $created_user_id, $data);
 

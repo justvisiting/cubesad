@@ -618,8 +618,16 @@ function country_code_to_country( $code ){
 									<label for="tax_id">Tax ID</label>
 								</div>
 							</div> <!-- .field-group -->
+                                                        
+                                                        <div class="field-group">
+			
+								<div class="field">
+                                                                        <input type="text" value="<?php if (isset($editdata['website'])){echo $editdata['website']; } else{ echo "http://"; } ?>" name="website" id="website" size="28" class="" />			
+									<label for="website">Website</label>
+								</div>
+							</div>
                             
-                            <div class="field-group">
+                            <!--<div class="field-group">
 			
 								<div class="field">
 									<input type="text" value="<?php if (isset($editdata['paypal_id'])){ echo $editdata['paypal_id']; } ?>" name="paypal_id" id="paypal_id" size="28" class="" />			

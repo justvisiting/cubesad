@@ -23,7 +23,7 @@
 								<div class="field">
 								<select id="publication_id" name="publication_id">
 								  <?php if (!isset($selector_pubid)){$selector_pubid='';} get_publication_dropdown($selector_pubid); ?>
-								</select>		
+								</select>
 									<label for="inv_type">Select Publication</label>
 								</div>
 							</div> <!-- .field-group -->

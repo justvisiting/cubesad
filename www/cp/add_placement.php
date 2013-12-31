@@ -14,13 +14,13 @@ require_once MAD_PATH . '/www/cp/restricted.php';
 require_once MAD_PATH . '/www/cp/admin_functions.php';
 
 
-if (!check_permission('inventory', $user_detail['user_id'])){
+/*if (!check_permission('inventory', $user_detail['user_id'])){
 exit;
 }
 
 if (!check_permission_simple('modify_publications', $user_detail['user_id'])){
 exit;	
-}
+}*/
 
 global $current_action;
 $current_action='create';

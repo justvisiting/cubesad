@@ -27,7 +27,15 @@ if (!isset($integration_active)){$integration_active='';}
 			
 								<div class="field">
 								<select onchange="this.form.submit();"  id="publication_id" name="zone">
-								  <?php get_placement_integration_dropdown($_GET['zone'], $_GET['publication']); ?>
+								  <?php
+                                                                    global $user_detail;
+                                                                    global $user_right;
+                                                                    if(isset($user_right["publisher"])){
+                                                                        get_placement_integration_dropdown("",$user_detail["inv_id"]);
+                                                                    }else{
+                                                                        get_placement_integration_dropdown($_GET['zone'], $_GET['publication']); 
+                                                                    }
+                                                                  ?>
 								</select>		
 									<label for="inv_type">Select Placement</label>
 								</div>
