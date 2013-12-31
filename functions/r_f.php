@@ -219,9 +219,8 @@ return false;
 }
 // insert into md_campaign_view table whenever campaign is paying for click or for impression 
 // and we get impression or click accroding to selected campaign.
-if(function_exists("insertClickOrImpression")){
-    insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
-}
+insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
+
 
 if ($repcard_detail['entry_id']>0){
     mysql_query("UPDATE md_reporting set total_requests=total_requests+".$add_request.", total_requests_sec=total_requests_sec+".$add_request_sec.", total_impressions=total_impressions+".$add_impression.", total_clicks=total_clicks+".$add_click." WHERE entry_id='".$repcard_detail['entry_id']."'", $repdb);
