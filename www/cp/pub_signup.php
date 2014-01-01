@@ -60,14 +60,14 @@ header("Pragma: no-cache");
                     global $errormessage;
                     $errormessage='A user with this e-mail address already exists in the system.';
                     global $editdata;
-                    $editdata=$data;
+                    $editdata=$_POST;
                     
                 }
             }else{
                 global $errormessage;
                 $errormessage='Enter Valid Email Address.';
                 global $editdata;
-                $editdata=$data;
+                $editdata=$_POST;
                 
             }
         }
@@ -321,7 +321,7 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 						
 					</div> <!-- .widget -->
                     
-                    <div class="notify">			
+                    <!--<div class="notify">			
                         <p><input name="mobfox_backfill_active" id="mobfox_backfill_active" type="checkbox" value="1" /><label for="mobfox_backfill_active"><strong>BackFill - </strong>Attempt to show an ad from the MobFox:Connect network before an ad space remains unfilled. (recommended)</label></p>
                     </div> <!-- .notify -->
                   <script language="javascript">if (document.forms["crudpublication"].elements["zone_size"].value!='10'){hideadiv('widthzonediv'); hideadiv('heightzonediv');} else {showadiv('widthzonediv'); showadiv('heightzonediv');} if (document.forms["crudpublication"].elements["inv_type"].value=='3'){hideadiv('interstitialoptiobutton');} else {showadiv('interstitialoptiobutton');}
