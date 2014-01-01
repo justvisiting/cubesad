@@ -483,7 +483,21 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_pending_actions` (
   PRIMARY KEY  (`entry_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
 
-// added new fields email_address,pass_word,paypal_id,amount_paid
+/*mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
+  `inv_id` int(11) NOT NULL auto_increment,
+  `creator_id` varchar(100) NOT NULL,
+  `inv_status` varchar(100) NOT NULL,
+  `inv_type` varchar(100) NOT NULL,
+  `inv_name` varchar(100) NOT NULL,
+  `inv_description` varchar(100) NOT NULL,
+  `inv_address` varchar(100) NOT NULL,
+  `inv_defaultchannel` varchar(100) NOT NULL,
+  `md_lastrequest` varchar(100) NOT NULL,
+  PRIMARY KEY  (`inv_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
+*/
+
+// added new fields email_address,pass_word,paypal_id,amount_paid,bank_acc,location
 
 mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
   `inv_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -498,7 +512,9 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_publications` (
   `email_address` varchar(100) NOT NULL,
   `pass_word` varchar(100) NOT NULL,
   `paypal_id` varchar(100) NOT NULL,
-  `amount_paid` UNSIGNED BIGINT NOT NULL DEFAULT '0',
+  `amount_paid` varchar(10) NOT NULL,
+  `bank_acc` varchar(100) DEFAULT NULL,
+  `location` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`inv_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;",$maindb);
 
@@ -5146,6 +5162,7 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_campaign_view` (
   `campaign_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;",$maindb);
+
 
 
 if ($data['mobfox_connect_type']==1){

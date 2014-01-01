@@ -56,11 +56,11 @@ function logincheck(){
                     }else{
                         // for publisher
                         global  $user_detail;
-                        $pub_result = mysql_query("SELECT inv_id,inv_name,inv_status,inv_type,inv_description,inv_address,inv_defaultchannel,md_lastrequest,email_address,paypal_id,amount_paid FROM md_publications WHERE email_address= '$sessiondet[user_identification]'",$maindb);
+                        $pub_result = mysql_query("SELECT * FROM md_publications WHERE email_address= '$sessiondet[user_identification]'",$maindb);
                         $user_detail = mysql_fetch_array($pub_result);
                         global $user_right;
                          $user_right =  array(
-                             "publisher" => TRUE,
+                             "publisher" => TRUE
                          );
                     }
                     return true;

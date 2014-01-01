@@ -219,8 +219,9 @@ return false;
 }
 // insert into md_campaign_view table whenever campaign is paying for click or for impression 
 // and we get impression or click accroding to selected campaign.
-insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
-
+if(function_exists("insertClickOrImpression")){
+    insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
+}
 
 if ($repcard_detail['entry_id']>0){
     mysql_query("UPDATE md_reporting set total_requests=total_requests+".$add_request.", total_requests_sec=total_requests_sec+".$add_request_sec.", total_impressions=total_impressions+".$add_impression.", total_clicks=total_clicks+".$add_click." WHERE entry_id='".$repcard_detail['entry_id']."'", $repdb);
@@ -1103,6 +1104,9 @@ $query_part['channel']='';
 $query_part['placement']="AND (md_campaigns.publication_target=1 OR (c3.targeting_type='placement' AND c3.targeting_code='".$zone_detail['entry_id']."'))";
 
 $query_part['misc']="AND md_campaigns.campaign_status=1 AND md_campaigns.campaign_start<='".date("Y-m-d")."' AND md_campaigns.campaign_end>'".date("Y-m-d")."'";
+
+
+//$request_settings['main_device'] contains array of device which is currently accessing the ad.
 
 switch ($request_settings['main_device']){
 	

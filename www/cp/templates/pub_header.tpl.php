@@ -13,3 +13,10 @@
             <li><a href="reporting.php?type=publication">Publication Reporting</a></li>
         </ul>	
 </li>
+<li id="navCharts" class="nav<?php if ($current_section=="payment"){echo " active"; } ?>">
+        <span class="icon-transfer"></span>
+        <a href="#">Payment</a>
+        <ul class="subNav">
+            <li><a href="payment.php">Payment</a></li>
+        </ul>	
+</li>
