@@ -1,5 +1,7 @@
 <?php
 require_once dirname(__FILE__) . "/../www/cp/custom_functions.php";
+$current_device = NULL;
+$current_os = NULL;
 //error_reporting(0);
 global $repdb_connected;
 $repdb_connected=0;
@@ -220,7 +222,9 @@ return false;
 // insert into md_campaign_view table whenever campaign is paying for click or for impression 
 // and we get impression or click accroding to selected campaign.
 if(function_exists("insertClickOrImpression")){
-    insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
+    if(isset($campaign_id) && strlen($campaign_id) > 0){
+        insertClickOrImpression($campaign_id,$current_timestamp,$publication_id,$add_impression,$add_click,$repdb);
+    }
 }
 
 if ($repcard_detail['entry_id']>0){
@@ -1023,14 +1027,20 @@ return $cache_result;
 }
 	
 global $maindb;
-
+global $current_device;
+global $current_os;
 
 $campaignarray = array();
 
 $usrres=mysql_query($q, $maindb);
 while($campaign_detail=mysql_fetch_array($usrres)){
-$add = array('campaign_id'=>$campaign_detail['campaign_id'],'priority'=>$campaign_detail['campaign_priority'],'type'=>$campaign_detail['campaign_type'],'network_id'=>$campaign_detail['campaign_networkid']);
-array_push($campaignarray, $add);
+    if($campaign_detail["device_target"] == 2 && mapCampaignAndDevice($campaign_detail["campaign_id"],$current_device,$current_os)){
+        $add = array('campaign_id'=>$campaign_detail['campaign_id'],'priority'=>$campaign_detail['campaign_priority'],'type'=>$campaign_detail['campaign_type'],'network_id'=>$campaign_detail['campaign_networkid']);
+        array_push($campaignarray, $add);
+    }else if($campaign_detail["device_target"] == 1 ){
+        $add = array('campaign_id'=>$campaign_detail['campaign_id'],'priority'=>$campaign_detail['campaign_priority'],'type'=>$campaign_detail['campaign_type'],'network_id'=>$campaign_detail['campaign_networkid']);
+        array_push($campaignarray, $add);
+    }
 }
 
 if (count($campaignarray)<1){
@@ -1107,29 +1117,43 @@ $query_part['misc']="AND md_campaigns.campaign_status=1 AND md_campaigns.campaig
 
 
 //$request_settings['main_device'] contains array of device which is currently accessing the ad.
+//campaign and device mapping is store in md_device_targeting so we have to match that mapping In query Result.
+
 
 switch ($request_settings['main_device']){
 	
 case 'IPHONE':
-$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_iphone=1)';
+    global $current_device;
+    $current_device = "iphone";
+//$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_iphone=1)';
 break;
 
 case 'IPOD':
-$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_ipod=1)';
+    global $current_device;
+    $current_device = "ipod";
+//$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_ipod=1)';
 break;
 
 case 'IPAD':
-$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_ipad=1)';
+    global $current_device;
+    $current_device = "ipad";
+//$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_ipad=1)';
 break;
 
 case 'ANDROID':
-$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_android=1)';
+    global $current_device;
+    $current_device = "android";
+//$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_android=1)';
 break;
 
 default:
-$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_other=1)';
+    global $current_device;
+    $current_device = "other";
+//$query_part['device']='AND (md_campaigns.device_target=1 OR md_campaigns.target_other=1)';
 break;
 }
+
+
 
 if ($request_settings['main_device']!='OTHER' && $request_settings['main_device']!='NOMOBILE'){
 switch ($request_settings['main_device']){
@@ -1138,27 +1162,39 @@ case 'IPHONE':
 case 'IPOD':
 case 'IPAD':
 if (isset($request_settings['device_os']) && !empty($request_settings['device_os'])){
-$query_part['osversion']="AND ((md_campaigns.ios_version_min<=".$request_settings['device_os']." OR md_campaigns.ios_version_min='') AND (md_campaigns.ios_version_max>=".$request_settings['device_os']." OR md_campaigns.ios_version_max=''))";
+    global $current_os;
+    $current_os = $request_settings['device_os'];
+    //$query_part['osversion']="AND ((md_campaigns.ios_version_min<=".$request_settings['device_os']." OR md_campaigns.ios_version_min='') AND (md_campaigns.ios_version_max>=".$request_settings['device_os']." OR md_campaigns.ios_version_max=''))";
 }
 else {
-$query_part['osversion']="AND (md_campaigns.ios_version_min='' AND md_campaigns.ios_version_max='')";	
+    global $current_os;
+    $current_os = NULL;
+//$query_part['osversion']="AND (md_campaigns.ios_version_min='' AND md_campaigns.ios_version_max='')";	
 }
 break;
 
 case 'ANDROID':
 if (isset($request_settings['device_os']) && !empty($request_settings['device_os'])){
-$query_part['osversion']="AND ((md_campaigns.android_version_min<=".$request_settings['device_os']." OR md_campaigns.android_version_min='') AND (md_campaigns.android_version_max>=".$request_settings['device_os']." OR md_campaigns.android_version_max=''))";
+    global $current_os;
+    $current_os = $request_settings['device_os'];
+    //$query_part['osversion']="AND ((md_campaigns.android_version_min<=".$request_settings['device_os']." OR md_campaigns.android_version_min='') AND (md_campaigns.android_version_max>=".$request_settings['device_os']." OR md_campaigns.android_version_max=''))";
 }
 else {
-$query_part['osversion']="AND (md_campaigns.android_version_min='' AND md_campaigns.android_version_max='')";	
+    global $current_os;
+    $current_os = NULL;
+    //$query_part['osversion']="AND (md_campaigns.android_version_min='' AND md_campaigns.android_version_max='')";	
 }
 break;
 
 }
 }
 else {
-$query_part['osversion']="";
+    global $current_os;
+    $current_os = NULL;
+    //$query_part['osversion']="";
 }
+$query_part['device'] = "";
+$query_part['osversion']="";
 
 switch ($zone_detail['zone_type']){
 case 'banner':
@@ -1180,8 +1216,8 @@ if (MAD_IGNORE_DAILYLIMIT_NOCRON && !check_cron_active()){
 $query_part['limit']="AND ((md_campaign_limit.total_amount_left='' OR md_campaign_limit.total_amount_left>=1) OR (md_campaign_limit.cap_type=1))";
 }
 
-$request_settings['campaign_query']="select md_campaigns.campaign_id, md_campaigns.campaign_priority, md_campaigns.campaign_type, md_campaigns.campaign_networkid from md_campaigns LEFT JOIN md_campaign_targeting c1 ON md_campaigns.campaign_id = c1.campaign_id LEFT JOIN md_campaign_targeting c2 ON md_campaigns.campaign_id = c2.campaign_id LEFT JOIN md_campaign_targeting c3 ON md_campaigns.campaign_id = c3.campaign_id LEFT JOIN md_ad_units ON md_campaigns.campaign_id = md_ad_units.campaign_id LEFT JOIN md_campaign_limit ON md_campaigns.campaign_id = md_campaign_limit.campaign_id where (md_campaigns.country_target=1".$query_part['geo']." ".$query_part['channel']." ".$query_part['placement']." ".$query_part['misc']." ".$query_part['device']." ".$query_part['osversion']." ".$query_part['adunit']." ".$query_part['limit']." group by md_campaigns.campaign_id";
-
+//$request_settings['campaign_query']="select md_campaigns.campaign_id, md_campaigns.campaign_priority, md_campaigns.campaign_type, md_campaigns.campaign_networkid from md_campaigns LEFT JOIN md_campaign_targeting c1 ON md_campaigns.campaign_id = c1.campaign_id LEFT JOIN md_campaign_targeting c2 ON md_campaigns.campaign_id = c2.campaign_id LEFT JOIN md_campaign_targeting c3 ON md_campaigns.campaign_id = c3.campaign_id LEFT JOIN md_ad_units ON md_campaigns.campaign_id = md_ad_units.campaign_id LEFT JOIN md_campaign_limit ON md_campaigns.campaign_id = md_campaign_limit.campaign_id where (md_campaigns.country_target=1".$query_part['geo']." ".$query_part['channel']." ".$query_part['placement']." ".$query_part['misc']." ".$query_part['device']." ".$query_part['osversion']." ".$query_part['adunit']." ".$query_part['limit']." group by md_campaigns.campaign_id";
+$request_settings['campaign_query']="select md_campaigns.campaign_id, md_campaigns.campaign_priority, md_campaigns.campaign_type, md_campaigns.campaign_networkid,md_campaigns.device_target from md_campaigns LEFT JOIN md_campaign_targeting c1 ON md_campaigns.campaign_id = c1.campaign_id LEFT JOIN md_campaign_targeting c2 ON md_campaigns.campaign_id = c2.campaign_id LEFT JOIN md_campaign_targeting c3 ON md_campaigns.campaign_id = c3.campaign_id LEFT JOIN md_ad_units ON md_campaigns.campaign_id = md_ad_units.campaign_id LEFT JOIN md_campaign_limit ON md_campaigns.campaign_id = md_campaign_limit.campaign_id where (md_campaigns.country_target=1".$query_part['geo']." ".$query_part['channel']." ".$query_part['placement']." ".$query_part['misc']." ".$query_part['device']." ".$query_part['osversion']." ".$query_part['adunit']." ".$query_part['limit']." group by md_campaigns.campaign_id";
 
 return true;	
 	

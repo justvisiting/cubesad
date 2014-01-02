@@ -440,3 +440,18 @@ function getCountries(){
 EOT;
     return $str;
 }
+
+function mapCampaignAndDevice($camp_id,$currentDevice,$currentOs){
+    global $maindb;
+    $isCampaingForDevice = false;
+    $sql = "SELECT * FROM  `md_device_targeting` JOIN md_device ON md_device_targeting.device_id = md_device.device_id WHERE campaign_id = $camp_id";
+    $result =  mysql_query($sql,$maindb);
+    while($row = mysql_fetch_array($result)){
+        if(isset($currentDevice) && strtolower($row["device_name"]) == strtolower($currentDevice)){
+            if(isset($currentOs) && $currentOs >= $row["min"] && $currentOs <= $row["max"] ){
+                $isCampaingForDevice = true;
+            }
+        }
+    }
+    return $isCampaingForDevice;
+}
