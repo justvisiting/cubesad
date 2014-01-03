@@ -1,7 +1,8 @@
-<script src="assets/javascripts/jquery-1.7.1.min.js"></script>
-
-<script src="assets/javascripts/plugins/autocomplete/jquery.autoSuggest.js"></script>
 <link rel="stylesheet" type="text/css" href="assets/javascripts/plugins/autocomplete/autoSuggest.css">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<script src="assets/javascripts/jquery-1.7.1.min.js"></script>
+<script src="assets/javascripts/plugins/autocomplete/jquery.autoSuggest.js"></script>
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
 <SCRIPT LANGUAGE="JavaScript">
 <!-- 	
@@ -115,7 +116,6 @@ function checkAll(theForm, cName, status) {
 		    theForm.elements[i].checked = status;
 		  }
 		}
-
 </script>
 
 
@@ -139,12 +139,25 @@ function checkAll(theForm, cName, status) {
 						  <div class="field-group">
 			
 								<div class="field">
-								<select <?php if ($current_action=='create'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block'; document.getElementById('create_adunit').style.display='none';} else {document.getElementById('network_select').style.display='none'; document.getElementById('create_adunit').style.display='block';}"<?php } ?><?php if ($current_action=='edit'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block';} else {document.getElementById('network_select').style.display='none';}"<?php } ?> id="campaign_type" name="campaign_type">
-								  <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==1){echo 'selected="selected"'; } ?> value="1">Direct Sold</option>
-								  <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==2){echo 'selected="selected"'; } ?> value="2">Promotional</option>
-								  <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']=='network'){echo 'selected="selected"'; } ?> value="network">Ad Network</option>
-								  
-							  </select>		<a style="font-size:11px;" href="#" onclick="$.modal ({title: 'Campaign Types', html: '<div style=width:500px;;><h3>Direct Sold</h3>A direct sold campaign is a fixed campaign in the system, typically with a high priority and a limited number of impressions.<br><br><h3>Promotional</h3>A promotional campaign is a campaign cross-promoting other apps or products. Cross promotional campaigns typically have a low priority to only show when an ad space cannot be filled by direct sold campaigns or ad networks.<br><br><h3>Ad Network</h3>An ad network campaign is a campaign sending traffic to a particular network. If a network is unable to fill the ad-request, the system will automatically select the next campaign with a lower priority until an ad has been found. Ad Network campaigns are usually targeted by country in order to select the best-paying partner for a particular geographic.</div>'});" title="Click for more info">Info</a>
+                                                                    <?php
+                                                                        global $user_detail;
+                                                                        // if user == advertiser
+                                                                        if(isset($user_detail["account_type"]) && $user_detail["account_type"] == 2){
+                                                                    ?>
+                                                                        <select <?php if ($current_action=='create'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('create_adunit').style.display='none';} else {document.getElementById('create_adunit').style.display='block';}; callme(this); "<?php } ?> id="campaign_type" name="campaign_type">
+                                                                              <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==1){echo 'selected="selected"'; } ?> value="1">Direct Sold</option>
+                                                                              <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==2){echo 'selected="selected"'; } ?> value="2">Promotional</option>
+                                                                              <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']=='network'){echo 'selected="selected"'; } ?> value="network">Ad Network</option>	  
+                                                                        </select>
+                                                                    <?php } else { ?>
+                                                                        <select <?php if ($current_action=='create'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block'; document.getElementById('create_adunit').style.display='none';} else {document.getElementById('network_select').style.display='none'; document.getElementById('create_adunit').style.display='block';}"<?php } ?><?php if ($current_action=='edit'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block';} else {document.getElementById('network_select').style.display='none';}"<?php } ?> id="campaign_type" name="campaign_type">
+                                                                               <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==1){echo 'selected="selected"'; } ?> value="1">Direct Sold</option>
+                                                                               <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==2){echo 'selected="selected"'; } ?> value="2">Promotional</option>
+                                                                               <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']=='network'){echo 'selected="selected"'; } ?> value="network">Ad Network</option>
+
+                                                                        </select>
+                                                                    <?php } ?>
+                                                                        <a style="font-size:11px;" href="#" onclick="$.modal ({title: 'Campaign Types', html: '<div style=width:500px;;><h3>Direct Sold</h3>A direct sold campaign is a fixed campaign in the system, typically with a high priority and a limited number of impressions.<br><br><h3>Promotional</h3>A promotional campaign is a campaign cross-promoting other apps or products. Cross promotional campaigns typically have a low priority to only show when an ad space cannot be filled by direct sold campaigns or ad networks.<br><br><h3>Ad Network</h3>An ad network campaign is a campaign sending traffic to a particular network. If a network is unable to fill the ad-request, the system will automatically select the next campaign with a lower priority until an ad has been found. Ad Network campaigns are usually targeted by country in order to select the best-paying partner for a particular geographic.</div>'});" title="Click for more info">Info</a>
 									<label for="campaign_type">Campaign Type</label>
 								</div>
 							</div> <!-- .field-group -->
@@ -167,6 +180,40 @@ function checkAll(theForm, cName, status) {
 									<label for="campaign_priority">Campaign Priority</label>
 								</div>
 							</div> <!-- .field-group -->
+                                                        
+                                                        <script>
+                                                          var allCampaignPriority = document.getElementById("campaign_priority").innerHTML;
+                                                            function callme(objSelect){
+                                                                var str = "";
+                                                                    var priorityArr = allCampaignPriority.length > 0 ? allCampaignPriority.split("</option>") : Array();
+                                                                    var dd = document.getElementById("campaign_priority");
+                                                                    //console.log(priorityArr);
+                                                                    //alert(priorityArr);
+                                                                    for(index = 0; index < priorityArr.length ; index++){
+                                                                        if(objSelect.value == 1 && priorityArr[index].indexOf("Highest") > 0){
+                                                                            //str = "<option value=''>Select Priority</option>";
+                                                                            str += priorityArr[index];
+                                                                            break;
+                                                                        }else if(objSelect.value == "network" && priorityArr[index].indexOf("Medium") > 0){
+                                                                            //str = "<option value=''>Select Priority</option>";
+                                                                            str += priorityArr[index];
+                                                                            break;
+                                                                        }else if(objSelect.value == 2 && priorityArr[index].indexOf("Lowest") > 0){
+                                                                            //str = "<option value=''>Select Priority</option>";
+                                                                            str += priorityArr[index];
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                    dd.value = "";
+                                                                    dd.innerHTML = str;
+                                                                    dd.selectedIndex = 0;
+                                                                    $("#uniform-campaign_priority span").html($("#campaign_priority option:selected").text());
+                                                                    //$("#campaign_priority option:first-child").attr("selected","selected");
+                                                                //alert("hi");
+                                                            }
+                                                            <?php if(isset($user_detail["account_type"]) && $user_detail["account_type"] == 2){ ?>callme(document.getElementById("campaign_type")); <?php } ?>
+                                                      </script>
+                                                        
                             
                             <div class="field-group">
 			

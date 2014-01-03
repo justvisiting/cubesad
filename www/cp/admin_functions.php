@@ -2415,8 +2415,175 @@ return true;
 }
 
 if ($type=='ad_unit'){
-	
-	if (empty($data['adv_name']) or ($data['creative_format']==10 && (!is_numeric($data['custom_creative_width']) or !is_numeric($data['custom_creative_height'])))){
+    if(empty($data["creative_format"]) || !is_numeric($data['creative_format'])){
+        global $errormessage;
+        $errormessage='Please select creative format';
+        global $editdata;
+        $editdata=$data;
+        return false;	
+    }else{
+        // if creative format is : 
+        if($data["creative_format"] == 1 || $data["creative_format"] == 2 || $data["creative_format"] == 3 || $data["creative_format"] == 4 || $data["creative_format"] == 5 || $data["creative_format"] == 6 || $data["creative_format"] == 10 || $data["creative_format"] == 12 || $data["creative_format"] == 13 || $data["creative_format"] == 14){
+            if (empty($data['adv_name']) or ($data['creative_format']==10 && (!is_numeric($data['custom_creative_width']) or !is_numeric($data['custom_creative_height'])))){
+                global $errormessage;
+                $errormessage='Please fill out all required fields.';
+                global $editdata;
+                $editdata=$data;
+                return false;	
+            }
+            if ($data['creative_type']==3){
+                if (empty($data['html_body'])){
+                    global $errormessage;
+                    $errormessage='Please enter a HTML body for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+            }
+
+            if ($data['creative_type']==2){
+                if (empty($data['creative_url']) or empty($data['click_url'])){
+                    global $errormessage;
+                    $errormessage='Please enter a Creative URL and Click URL for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+            }
+            if ($data['creative_type']==1){
+                if (empty($data['click_url'])){
+                    global $errormessage;
+                    $errormessage='Please enter a Click URL for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+                if(!file_exists($_FILES['creative_file']['tmp_name']) || !is_uploaded_file($_FILES['creative_file']['tmp_name'])) {
+                    global $errormessage;
+                    $errormessage='Please upload a creative for your ad unit.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;
+                }	
+            }
+            
+        }else if($data["creative_format"] == 15 || $data["creative_format"] == 16 || $data["creative_format"] == 17){
+            $haveAtleastOneCreativeUpload1 = false;
+            $haveAtleastOneCreativeUpload2 = false;
+            $haveAtleastOneCreativeUpload3 = false;
+            $haveAtleastOneCreativeUpload4 = false;
+            
+            $haveAtleastOneCreativeUrl1 = false;
+            $haveAtleastOneCreativeUrl2 = false;
+            $haveAtleastOneCreativeUrl3 = false;
+            $haveAtleastOneCreativeUrl4 = false;
+            
+            $haveAtleastOneCreativeHtml1 = false;
+            $haveAtleastOneCreativeHtml2 = false;
+            $haveAtleastOneCreativeHtml3 = false;
+            $haveAtleastOneCreativeHtml4 = false;
+            
+            if (empty($data['adv_name'])){
+                global $errormessage;
+                $errormessage='Please fill out creative name.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if($data["creative_format"] == 15 && empty($data["ad_description"])){
+                global $errormessage;
+                $errormessage='Please Enter Ad Description.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if($data["creative_format"] == 16 && (!file_exists($_FILES['small_img']['tmp_name']) || !is_uploaded_file($_FILES['small_img']['tmp_name']))){
+                global $errormessage;
+                $errormessage='Please upload a small Image for your ad unit.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            
+            // check for at least one creative has been uploaded.
+            if($data["creative_type"] == 1 && ( !empty($data['click_url']) && file_exists($_FILES['creative_file']['tmp_name']) && is_uploaded_file($_FILES['creative_file']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload1 = true;
+            }
+            if($data["creative_type2"] == 1 && ( !empty($data['click_url2']) && file_exists($_FILES['creative_file2']['tmp_name']) && is_uploaded_file($_FILES['creative_file2']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload2 = true;
+            }
+            if($data["creative_type3"] == 1 && ( !empty($data['click_url3']) && file_exists($_FILES['creative_file3']['tmp_name']) && is_uploaded_file($_FILES['creative_file3']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload3 = true;
+            }
+            if($data["creative_type4"] == 1 && ( !empty($data['click_url4']) && file_exists($_FILES['creative_file4']['tmp_name']) && is_uploaded_file($_FILES['creative_file4']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload4 = true;
+            }
+            
+            // check for at least one creative have url.
+            if($data["creative_type"] == 2 && ( !empty($data['click_url']) && !empty($data["creative_url"]) ) ){
+                $haveAtleastOneCreativeUrl1 = true;
+            }
+            if($data["creative_type2"] == 2 && ( !empty($data['click_url2']) && !empty($data["creative_url2"]) ) ){
+                $haveAtleastOneCreativeUrl2 = true;
+            }
+            if($data["creative_type3"] == 2 && ( !empty($data['click_url3']) && empty($data["creative_url3"]) ) ){
+                $haveAtleastOneCreativeUrl3 = true;
+            }
+            if($data["creative_type4"] == 2 && ( !empty($data['click_url4']) && !empty($data["creative_url4"]) ) ){
+                $haveAtleastOneCreativeUrl4 = true;
+            }
+            
+            // check for at least one creative have html.
+            if($data["creative_type"] == 3 && (  !empty($data["html_body"]) ) ){
+                $haveAtleastOneCreativeHtml1 = true;
+            }
+            if($data["creative_type2"] == 3 && ( !empty($data["html_body2"]) ) ){
+                $haveAtleastOneCreativeHtml2 = true;
+            }
+            if($data["creative_type3"] == 3 && ( !empty($data["html_body3"]) ) ){
+                $haveAtleastOneCreativeHtml3 = true;
+            }
+            if($data["creative_type4"] == 3 && ( !empty($data["html_body4"]) ) ){
+                $haveAtleastOneCreativeHtml4 = true;
+            }
+            if($haveAtleastOneCreativeUpload1 || $haveAtleastOneCreativeUpload2 || $haveAtleastOneCreativeUpload3 || $haveAtleastOneCreativeUpload4 || $haveAtleastOneCreativeUrl1 || $haveAtleastOneCreativeUrl2 || $haveAtleastOneCreativeUrl3 || $haveAtleastOneCreativeUrl4 || $haveAtleastOneCreativeHtml1 || $haveAtleastOneCreativeHtml2 || $haveAtleastOneCreativeHtml3 || $haveAtleastOneCreativeHtml4){
+                // have at least one file to upload.
+            }else{
+                // nothing filled.
+                global $errormessage;
+                $errormessage='Please upload at least one creative for your ad unit with click url.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            
+        }else if($data["creative_format"] == 11){
+            if (empty($data['adv_name'])){
+                global $errormessage;
+                $errormessage='Please fill out creative name.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if(empty($data["ad_description"])){
+                global $errormessage;
+                $errormessage='Please Enter Ad Description.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if(empty($data["click_url_text"])){
+                global $errormessage;
+                $errormessage='Please Enter Click URL.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+        }
+    }	
+    
+    
+/*if (empty($data['adv_name']) or ($data['creative_format']==10 && (!is_numeric($data['custom_creative_width']) or !is_numeric($data['custom_creative_height'])))){
 global $errormessage;
 $errormessage='Please fill out all required fields.';
 global $editdata;
@@ -2478,7 +2645,7 @@ return false;
 }
 	
 }
-
+*/
 // Define Image Sizes
 if ($data['creative_format']==1){$data['custom_creative_width']=320; $data['custom_creative_height']=50;}
 if ($data['creative_format']==2){$data['custom_creative_width']=300; $data['custom_creative_height']=250;}
@@ -2489,129 +2656,135 @@ if ($data['creative_format']==6){$data['custom_creative_width']=320; $data['cust
 // End Define Image Sizes
 
 
-// IF CREATIVE TYPE =1, ATTEMPT TO UPLOAD CREATIVE
-if ($data['creative_type']==1){
-	
-$creative_server=getconfig_var('default_creative_server');
-	
-// Generate Creative Hash
-$uniqid = uniqid(time());
-$creative_hash=md5($uniqid);
-
-$file_extension=strtolower(substr(strrchr($_FILES['creative_file']['name'], "."), 1)); 
-
-
-// Case: Remote Creative Server (FTP)
-if (getconfig_var('default_creative_server')>1){
-	
-list($width, $height, $type, $attr)= getimagesize($_FILES['creative_file']['tmp_name']);
-
-if ($height!=$data['custom_creative_height'] or $width!=$data['custom_creative_width'] or empty($file_extension)){
-global $errormessage;
-$errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload a valid image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
-global $editdata;
-$editdata=$data;
-return false;
+if ($data['creative_type']==1  && $data['creative_format'] != 11){
+    $checkDimension = false;
+    if($data['creative_format'] <= 10 ){
+        $checkDimension = true;
+    }
+    $result =  uploadFileAtLocalOrServer("creative_file",$data,$checkDimension);
+    $creative_hash = "";
+    $file_extension = "";
+    if(!is_array($result) && $result === FALSE){
+        return false;
+    }else if (is_array($result)){
+        $creative_hash = $result["hash"];
+        $file_extension = $result["ext"];
+    }
 }
-	
-$creative_server_detail = get_creativeserver_detail(getconfig_var('default_creative_server'));
-
-if ($creative_server_detail['entry_id']<1){
-global $errormessage;
-$errormessage='The default creative server does not seem to exist. Please change your creative server in your mAdserve control panel under Configuration>Creative Servers';
-global $editdata;
-$editdata=$data;
-return false;
+if($data['creative_format'] >= 15 && $data['creative_format'] <= 17 ){
+    // upload small image for multipart banner
+    if($data["creative_format"] == 16){
+        $result =  uploadFileAtLocalOrServer("small_img",$data,false);
+        $smallImgUrl = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $smallImgUrl = $result["hash"] . "." . $result["ext"];
+        }
+    }
+    
+    if($data["creative_type2"] == 1 && $haveAtleastOneCreativeUpload2){
+        $result =  uploadFileAtLocalOrServer("creative_file2",$data,false);
+        $creative_hash2 = "";
+        $file_extension2 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash2 = $result["hash"];
+            $file_extension2 = $result["ext"];
+        }
+    }
+    if($data["creative_type3"] == 1 && $haveAtleastOneCreativeUpload3){
+        $result =  uploadFileAtLocalOrServer("creative_file3",$data,false);
+        $creative_hash3 = "";
+        $file_extension3 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash3 = $result["hash"];
+            $file_extension3 = $result["ext"];
+        }
+    }
+    if($data["creative_type4"] == 1 && $haveAtleastOneCreativeUpload4){
+        $result =  uploadFileAtLocalOrServer("creative_file4",$data,false);
+        $creative_hash4 = "";
+        $file_extension4 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash4 = $result["hash"];
+            $file_extension4 = $result["ext"];
+        }
+    }
+    /*if($data["creative_type"] == 2 && $haveAtleastOneCreativeUrl1){
+        $banner_url = $data["creative_url2"];
+    }
+    if($data["creative_type2"] == 2 && $haveAtleastOneCreativeUrl2){
+        $banner_url2 = $data["creative_url2"];
+    }
+    if($data["creative_type3"] == 2 && $haveAtleastOneCreativeUrl3){
+        $banner_url3 = $data["creative_url2"];
+    }
+    if($data["creative_type4"] == 2 && $haveAtleastOneCreativeUrl4){
+        $banner_url4 = $data["creative_url2"];
+    }*/
+    
+    if($data["creative_type"] == 3 && $haveAtleastOneCreativeHtml1){
+        $adv_chtml = $data["html_body"];
+    }
+    if($data["creative_type2"] == 3 && $haveAtleastOneCreativeHtml2){
+        $adv_chtml_2 = $data["html_body2"];
+    }
+    if($data["creative_type3"] == 3 && $haveAtleastOneCreativeHtml3){
+        $adv_chtml_3 = $data["html_body3"];
+    }
+    if($data["creative_type4"] == 3 && $haveAtleastOneCreativeHtml4){
+        $adv_chtml_4 = $data["html_body4"];
+    }
 }
-
-// Attempt: Upload
-include MAD_PATH . '/modules/ftp/ftp.class.php';
-
-try {
-    $ftp = new Ftp;
-    $ftp->connect($creative_server_detail['remote_host']);
-    $ftp->login($creative_server_detail[remote_user], $creative_server_detail[remote_password]); 
-    $ftp->put($creative_server_detail[remote_directory] . $creative_hash . '.' . $file_extension , $_FILES['creative_file']['tmp_name'], FTP_BINARY);
-
-} catch (FtpException $e) {
-global $errormessage;
-$errormessage='FTP Client was unable to upload creative to remote server. Error given: '.$e->getMessage().'';
-global $editdata;
-$editdata=$data;
-return false;
-}
-
-// End: Upload
-
-}
-// End Case: Remote Creative Server (FTP)
-
-// Case: Local Creative Server
-if (getconfig_var('default_creative_server')==1){
-	
-
-include MAD_PATH . '/modules/upload/class.upload.php';
-
-
-$handle = new Upload($_FILES['creative_file']);
-$handle->allowed = array('image/*');
-$handle->file_new_name_body = $creative_hash;
-
- if ($handle->uploaded) {
-	 	 
-$image_width = $handle->image_src_x;
-$image_height = $handle->image_src_y;
-
-if ((!empty($image_width) && !empty($image_height)) && ($image_height!=$data['custom_creative_height'] or $image_width!=$data['custom_creative_width'])){
-global $errormessage;
-$errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload an image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
-global $editdata;
-$editdata=$data;
-return false;
-}
-	
-
-$handle->Process(MAD_PATH . MAD_CREATIVE_DIR);
-
-
- if ($handle->processed) {
-// OK 
- }
- else {
-global $errormessage;
-$errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
-global $editdata;
-$editdata=$data;
-return false;
- }
- 
- } else {
-	 // Not OK
-
-global $errormessage;
-$errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
-global $editdata;
-$editdata=$data;
-return false;
-	 
- }
- 
-}
- // End Case: Local Creative Sercer 
-}
-
-
-
 // END CREATIVE UPLOAD
-
 global $maindb;
 
 
 // Insert Ad Unit into DB
+$creative_server=getconfig_var('default_creative_server');
 if (!isset($creative_server)){$creative_server='';}
+
 if (!isset($creative_hash)){$creative_hash='';}
+if (!isset($creative_hash2)){$creative_hash2='';}
+if (!isset($creative_hash3)){$creative_hash3='';}
+if (!isset($creative_hash4)){$creative_hash4='';}
+
 if (!isset($file_extension)){$file_extension='';}
-if (!isset($data['adv_mraid'])){$data['adv_mraid']='';}
+if (!isset($file_extension2)){$file_extension2='';}
+if (!isset($file_extension3)){$file_extension3='';}
+if (!isset($file_extension4)){$file_extension4='';}
+
+
+
+if (!isset($adv_chtml)){$adv_chtml='';}
+if (!isset($adv_chtml_2)){$adv_chtml_2='';}
+if (!isset($adv_chtml_3)){$adv_chtml_3='';}
+if (!isset($adv_chtml_4)){$adv_chtml_4='';}
+
+if(!isset($data['adv_mraid'])){$data['adv_mraid'] = '';}
+if(!isset($data['adv_mraid2'])){$data['adv_mraid2'] = '';}
+if(!isset($data['adv_mraid3'])){$data['adv_mraid3'] = '';}
+if(!isset($data['adv_mraid4'])){$data['adv_mraid4'] = '';}
+
+if(!isset($data["click_url"])){$data["click_url"] = "";}
+if(!isset($data["click_url2"])){$data["click_url2"] = "";}
+if(!isset($data["click_url3"])){$data["click_url3"] = "";}
+if(!isset($data["click_url4"])){$data["click_url4"] = "";}
+
+$adv_chtml = sanitize($adv_chtml);
+$adv_chtml_2 = sanitize($adv_chtml_2);
+$adv_chtml_3 = sanitize($adv_chtml_3);
+$adv_chtml_4 = sanitize($adv_chtml_4);
+
+if($data["creative_format"] == 11){
+    $data["click_url"] = $data["click_url_text"];
+}
 
 $data['creative_type']=sanitize($data['creative_type']);
 $data['click_url']=sanitize($data['click_url']);
@@ -2623,8 +2796,17 @@ $data['custom_creative_height']=sanitize($data['custom_creative_height']);
 $data['custom_creative_width']=sanitize($data['custom_creative_width']);
 $data['adv_mraid']=sanitize($data['adv_mraid']);
 
-mysql_query("INSERT INTO md_ad_units (campaign_id, unit_hash, adv_type, adv_status, adv_click_url, adv_click_opentype, adv_chtml, adv_bannerurl, adv_impression_tracking_url, adv_name, adv_clickthrough_type, adv_creative_extension, adv_height, adv_width, creativeserver_id, adv_mraid)
-VALUES ('$data[campaign_id]', '$creative_hash', '$data[creative_type]', '1', '$data[click_url]', '', '$data[html_body]', '$data[creative_url]', '$data[tracking_pixel]', '$data[adv_name]', '', '$file_extension', '$data[custom_creative_height]', '$data[custom_creative_width]', '$creative_server', '$data[adv_mraid]')", $maindb);
+mysql_query("INSERT INTO md_ad_units (campaign_id, unit_hash, adv_type, adv_status, adv_click_url, adv_click_opentype, adv_chtml,
+    adv_bannerurl, adv_impression_tracking_url, adv_name, adv_clickthrough_type, adv_creative_extension, adv_height, adv_width, 
+    creativeserver_id, adv_mraid,banner_url2,banner_url3,banner_url4,small_img_url,ad_description,click_url_2,click_url_3,
+    click_url_4,unit_hash_2,unit_hash_3,unit_hash_4,adv_creative_extension2,adv_creative_extension3,adv_creative_extension4,
+    adv_chtml_2,adv_chtml_3,adv_chtml_4,adv_mraid_2,adv_mraid_3,adv_mraid_4)
+VALUES ('$created_campaign_id', '$creative_hash', '$data[creative_type]', '1', '$data[click_url]', '', '$data[html_body]', "
+        . "'$data[creative_url]', '$data[tracking_pixel]', '$data[adv_name]', '', '$file_extension', '$data[custom_creative_height]',"
+        . " '$data[custom_creative_width]', '$creative_server', '$data[adv_mraid]','$data[creative_url2]','$data[creative_url3]',"
+        . "'$data[creative_url4]','$smallImgUrl','$data[ad_description]','$data[click_url2]','$data[click_url3]','$data[click_url4]',"
+        . "'$creative_hash2','$creative_hash3','$creative_hash4','$file_extension2','$file_extension3','$file_extension4','$adv_chtml_2',"
+        . "'$adv_chtml_3','$adv_chtml_4','$data[adv_mraid2]','$data[adv_mraid3]','$data[adv_mraid4]')", $maindb);
 global $created_adunit_id;
 $created_adunit_id=mysql_insert_id($maindb);
 // END: Insert Ad Unit into DB
@@ -2712,126 +2894,20 @@ if($data['device_targeting'] ==2){
     }
 }
 
-if ($data['campaign_type']=='network' && (!is_numeric($data['campaign_networkid']))){
+/*if ($data['campaign_type']=='network' && (!is_numeric($data['campaign_networkid']))){
 global $errormessage;
 $errormessage='Please select an ad network to send your campaign traffic to.';
 global $editdata;
 $editdata=$data;
 return false;	
-}
+}*/
 
 if (!empty($data['total_amount']) && !is_numeric($data['total_amount'])){
-global $errormessage;
-$errormessage='Your daily cap needs to be a numeric value.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-if ($data['campaign_type']!='network'){
-	
-if (empty($data['adv_name']) or ($data['creative_format']==10 && (!is_numeric($data['custom_creative_width']) or !is_numeric($data['custom_creative_height'])))){
-global $errormessage;
-$errormessage='Please fill out all required fields.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-if (!is_numeric($data['creative_format'])){
-global $errormessage;
-$errormessage='Please choose a creative size for your ad.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-if ($data['creative_type']==3){
-
-if (empty($data['html_body'])){
-global $errormessage;
-$errormessage='Please enter a HTML body for your ad.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-	
-}
-
-if ($data['creative_type']==2){
-
-if (empty($data['creative_url']) or empty($data['click_url'])){
-global $errormessage;
-$errormessage='Please enter a Creative URL and Click URL for your ad.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-
-	
-}
-
-if ($data['creative_type']==1){
-
-if (empty($data['click_url'])){
-global $errormessage;
-$errormessage='Please enter a Click URL for your ad.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-if(!file_exists($_FILES['creative_file']['tmp_name']) || !is_uploaded_file($_FILES['creative_file']['tmp_name'])) {
-global $errormessage;
-$errormessage='Please upload a creative for your ad unit.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-	
-}
-
-if ($data['start_date_type']==2 && empty($data['startdate_value'])){
-global $errormessage;
-$errormessage='Please choose a start date for your campaign.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-if ($data['end_date_type']==2 && empty($data['enddate_value'])){
-global $errormessage;
-$errormessage='Please choose an end date for your campaign.';
-global $editdata;
-$editdata=$data;
-return false;	
-}
-
-
-if ($data['start_date_type']==2){
-$start_date=explode('/',$data['startdate_value']);
-$start_date_array['year']=$start_date[2];
-$start_date_array['day']=$start_date[1];
-$start_date_array['month']=$start_date[0];
-$start_date_array['unix']=strtotime("$start_date_array[year]-$start_date_array[month]-$start_date_array[day]");	
-}
-
-if ($data['end_date_type']==2){
-$end_date=explode('/',$data['enddate_value']);
-$end_date_array['year']=$end_date[2];
-$end_date_array['day']=$end_date[1];
-$end_date_array['month']=$end_date[0];
-$end_date_array['unix']=strtotime("$end_date_array[year]-$end_date_array[month]-$end_date_array[day]");	
-}
-
-if ($data['end_date_type']==2 && $end_date_array['unix']<time()){
-global $errormessage;
-$errormessage='The end date you entered is in the past. Please choose an end date in the future.';
-global $editdata;
-$editdata=$data;
-return false;	
+    global $errormessage;
+    $errormessage='Your daily cap needs to be a numeric value.';
+    global $editdata;
+    $editdata=$data;
+    return false;	
 }
 
 if(empty($data["budget"])){
@@ -2856,6 +2932,218 @@ if(empty($data["max_pricing"])){
     $editdata=$data;
     return false;
 }
+    
+// edit by raj.
+if ($data['campaign_type']!='network'){
+    
+    if(empty($data["creative_format"]) || !is_numeric($data['creative_format'])){
+        global $errormessage;
+        $errormessage='Please select creative format';
+        global $editdata;
+        $editdata=$data;
+        return false;	
+    }else{
+        // if creative format is : 
+        if($data["creative_format"] == 1 || $data["creative_format"] == 2 || $data["creative_format"] == 3 || $data["creative_format"] == 4 || $data["creative_format"] == 5 || $data["creative_format"] == 6 || $data["creative_format"] == 10 || $data["creative_format"] == 12 || $data["creative_format"] == 13 || $data["creative_format"] == 14){
+            if (empty($data['adv_name']) or ($data['creative_format']==10 && (!is_numeric($data['custom_creative_width']) or !is_numeric($data['custom_creative_height'])))){
+                global $errormessage;
+                $errormessage='Please fill out all required fields.';
+                global $editdata;
+                $editdata=$data;
+                return false;	
+            }
+            if ($data['creative_type']==3){
+                if (empty($data['html_body'])){
+                    global $errormessage;
+                    $errormessage='Please enter a HTML body for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+            }
+
+            if ($data['creative_type']==2){
+                if (empty($data['creative_url']) or empty($data['click_url'])){
+                    global $errormessage;
+                    $errormessage='Please enter a Creative URL and Click URL for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+            }
+            if ($data['creative_type']==1){
+                if (empty($data['click_url'])){
+                    global $errormessage;
+                    $errormessage='Please enter a Click URL for your ad.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;	
+                }
+                if(!file_exists($_FILES['creative_file']['tmp_name']) || !is_uploaded_file($_FILES['creative_file']['tmp_name'])) {
+                    global $errormessage;
+                    $errormessage='Please upload a creative for your ad unit.';
+                    global $editdata;
+                    $editdata=$data;
+                    return false;
+                }	
+            }
+            
+        }else if($data["creative_format"] == 15 || $data["creative_format"] == 16 || $data["creative_format"] == 17){
+            $haveAtleastOneCreativeUpload1 = false;
+            $haveAtleastOneCreativeUpload2 = false;
+            $haveAtleastOneCreativeUpload3 = false;
+            $haveAtleastOneCreativeUpload4 = false;
+            
+            $haveAtleastOneCreativeUrl1 = false;
+            $haveAtleastOneCreativeUrl2 = false;
+            $haveAtleastOneCreativeUrl3 = false;
+            $haveAtleastOneCreativeUrl4 = false;
+            
+            $haveAtleastOneCreativeHtml1 = false;
+            $haveAtleastOneCreativeHtml2 = false;
+            $haveAtleastOneCreativeHtml3 = false;
+            $haveAtleastOneCreativeHtml4 = false;
+            
+            if (empty($data['adv_name'])){
+                global $errormessage;
+                $errormessage='Please fill out creative name.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if($data["creative_format"] == 15 && empty($data["ad_description"])){
+                global $errormessage;
+                $errormessage='Please Enter Ad Description.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if($data["creative_format"] == 16 && (!file_exists($_FILES['small_img']['tmp_name']) || !is_uploaded_file($_FILES['small_img']['tmp_name']))){
+                global $errormessage;
+                $errormessage='Please upload a small Image for your ad unit.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            
+            // check for at least one creative has been uploaded.
+            if($data["creative_type"] == 1 && ( !empty($data['click_url']) && file_exists($_FILES['creative_file']['tmp_name']) && is_uploaded_file($_FILES['creative_file']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload1 = true;
+            }
+            if($data["creative_type2"] == 1 && ( !empty($data['click_url2']) && file_exists($_FILES['creative_file2']['tmp_name']) && is_uploaded_file($_FILES['creative_file2']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload2 = true;
+            }
+            if($data["creative_type3"] == 1 && ( !empty($data['click_url3']) && file_exists($_FILES['creative_file3']['tmp_name']) && is_uploaded_file($_FILES['creative_file3']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload3 = true;
+            }
+            if($data["creative_type4"] == 1 && ( !empty($data['click_url4']) && file_exists($_FILES['creative_file4']['tmp_name']) && is_uploaded_file($_FILES['creative_file4']['tmp_name']) ) ){
+                $haveAtleastOneCreativeUpload4 = true;
+            }
+            
+            // check for at least one creative have url.
+            if($data["creative_type"] == 2 && ( !empty($data['click_url']) && !empty($data["creative_url"]) ) ){
+                $haveAtleastOneCreativeUrl1 = true;
+            }
+            if($data["creative_type2"] == 2 && ( !empty($data['click_url2']) && !empty($data["creative_url2"]) ) ){
+                $haveAtleastOneCreativeUrl2 = true;
+            }
+            if($data["creative_type3"] == 2 && ( !empty($data['click_url3']) && empty($data["creative_url3"]) ) ){
+                $haveAtleastOneCreativeUrl3 = true;
+            }
+            if($data["creative_type4"] == 2 && ( !empty($data['click_url4']) && !empty($data["creative_url4"]) ) ){
+                $haveAtleastOneCreativeUrl4 = true;
+            }
+            
+            // check for at least one creative have html.
+            if($data["creative_type"] == 3 && (  !empty($data["html_body"]) ) ){
+                $haveAtleastOneCreativeHtml1 = true;
+            }
+            if($data["creative_type2"] == 3 && ( !empty($data["html_body2"]) ) ){
+                $haveAtleastOneCreativeHtml2 = true;
+            }
+            if($data["creative_type3"] == 3 && ( !empty($data["html_body3"]) ) ){
+                $haveAtleastOneCreativeHtml3 = true;
+            }
+            if($data["creative_type4"] == 3 && ( !empty($data["html_body4"]) ) ){
+                $haveAtleastOneCreativeHtml4 = true;
+            }
+            if($haveAtleastOneCreativeUpload1 || $haveAtleastOneCreativeUpload2 || $haveAtleastOneCreativeUpload3 || $haveAtleastOneCreativeUpload4 || $haveAtleastOneCreativeUrl1 || $haveAtleastOneCreativeUrl2 || $haveAtleastOneCreativeUrl3 || $haveAtleastOneCreativeUrl4 || $haveAtleastOneCreativeHtml1 || $haveAtleastOneCreativeHtml2 || $haveAtleastOneCreativeHtml3 || $haveAtleastOneCreativeHtml4){
+                // have at least one file to upload.
+            }else{
+                // nothing filled.
+                global $errormessage;
+                $errormessage='Please upload at least one creative for your ad unit with click url.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            
+        }else if($data["creative_format"] == 11){
+            if (empty($data['adv_name'])){
+                global $errormessage;
+                $errormessage='Please fill out creative name.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if(empty($data["ad_description"])){
+                global $errormessage;
+                $errormessage='Please Enter Ad Description.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            if(empty($data["click_url_text"])){
+                global $errormessage;
+                $errormessage='Please Enter Click URL.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+        }
+    }
+    
+    if ($data['start_date_type']==2 && empty($data['startdate_value'])){
+        global $errormessage;
+        $errormessage='Please choose a start date for your campaign.';
+        global $editdata;
+        $editdata=$data;
+        return false;
+    }
+
+    if ($data['end_date_type']==2 && empty($data['enddate_value'])){
+        global $errormessage;
+        $errormessage='Please choose an end date for your campaign.';
+        global $editdata;
+        $editdata=$data;
+        return false;
+    }
+
+    if ($data['start_date_type']==2){
+        $start_date=explode('/',$data['startdate_value']);
+        $start_date_array['year']=$start_date[2];
+        $start_date_array['day']=$start_date[1];
+        $start_date_array['month']=$start_date[0];
+        $start_date_array['unix']=strtotime("$start_date_array[year]-$start_date_array[month]-$start_date_array[day]");	
+    }
+
+    if ($data['end_date_type']==2){
+        $end_date=explode('/',$data['enddate_value']);
+        $end_date_array['year']=$end_date[2];
+        $end_date_array['day']=$end_date[1];
+        $end_date_array['month']=$end_date[0];
+        $end_date_array['unix']=strtotime("$end_date_array[year]-$end_date_array[month]-$end_date_array[day]");	
+    }
+
+    if ($data['end_date_type']==2 && $end_date_array['unix']<time()){
+        global $errormessage;
+        $errormessage='The end date you entered is in the past. Please choose an end date in the future.';
+        global $editdata;
+        $editdata=$data;
+        return false;	
+    }
+
+    
 /*$no_min_max = false;
 if(is_array($data["device"])){
     foreach($data["device"] as $td){
@@ -2885,116 +3173,93 @@ if ($data['creative_format']==6){$data['custom_creative_width']=320; $data['cust
 
 
 // IF CREATIVE TYPE =1, ATTEMPT TO UPLOAD CREATIVE
-if ($data['creative_type']==1){
-	
-// Generate Creative Hash
-$uniqid = uniqid(time());
-$creative_hash=md5($uniqid);
-
-$file_extension=strtolower(substr(strrchr($_FILES['creative_file']['name'], "."), 1)); 
-
-
-// Case: Remote Creative Server (FTP)
-if (getconfig_var('default_creative_server')>1){
-	
-list($width, $height, $type, $attr)= getimagesize($_FILES['creative_file']['tmp_name']);
-
-if ($height!=$data['custom_creative_height'] or $width!=$data['custom_creative_width'] or empty($file_extension)){
-global $errormessage;
-$errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload a valid image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
-global $editdata;
-$editdata=$data;
-return false;
-}
-	
-$creative_server_detail = get_creativeserver_detail(getconfig_var('default_creative_server'));
-
-if ($creative_server_detail['entry_id']<1){
-global $errormessage;
-$errormessage='The default creative server does not seem to exist. Please change your creative server in your mAdserve control panel under Configuration>Creative Servers';
-global $editdata;
-$editdata=$data;
-return false;
+if ($data['creative_type']==1  && $data['creative_format'] != 11){
+    $checkDimension = false;
+    if($data['creative_format'] <= 10 ){
+        $checkDimension = true;
+    }
+    $result =  uploadFileAtLocalOrServer("creative_file",$data,$checkDimension);
+    $creative_hash = "";
+    $file_extension = "";
+    if(!is_array($result) && $result === FALSE){
+        return false;
+    }else if (is_array($result)){
+        $creative_hash = $result["hash"];
+        $file_extension = $result["ext"];
+    }
 }
 
-// Attempt: Upload
-include MAD_PATH . '/modules/ftp/ftp.class.php';
-
-try {
-    $ftp = new Ftp;
-    $ftp->connect($creative_server_detail['remote_host']);
-    $ftp->login($creative_server_detail[remote_user], $creative_server_detail[remote_password]); 
-    $ftp->put($creative_server_detail[remote_directory] . $creative_hash . '.' . $file_extension , $_FILES['creative_file']['tmp_name'], FTP_BINARY);
-
-} catch (FtpException $e) {
-global $errormessage;
-$errormessage='FTP Client was unable to upload creative to remote server. Error given: '.$e->getMessage().'';
-global $editdata;
-$editdata=$data;
-return false;
+if($data['creative_format'] >= 15 && $data['creative_format'] <= 17 ){
+    // upload small image for multipart banner
+    if($data["creative_format"] == 16){
+        $result =  uploadFileAtLocalOrServer("small_img",$data,false);
+        $smallImgUrl = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $smallImgUrl = $result["hash"] . "." . $result["ext"];
+        }
+    }
+    
+    if($data["creative_type2"] == 1 && $haveAtleastOneCreativeUpload2){
+        $result =  uploadFileAtLocalOrServer("creative_file2",$data,false);
+        $creative_hash2 = "";
+        $file_extension2 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash2 = $result["hash"];
+            $file_extension2 = $result["ext"];
+        }
+    }
+    if($data["creative_type3"] == 1 && $haveAtleastOneCreativeUpload3){
+        $result =  uploadFileAtLocalOrServer("creative_file3",$data,false);
+        $creative_hash3 = "";
+        $file_extension3 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash3 = $result["hash"];
+            $file_extension3 = $result["ext"];
+        }
+    }
+    if($data["creative_type4"] == 1 && $haveAtleastOneCreativeUpload4){
+        $result =  uploadFileAtLocalOrServer("creative_file4",$data,false);
+        $creative_hash4 = "";
+        $file_extension4 = "";
+        if(!is_array($result) && $result === FALSE){
+            return false;
+        }else if (is_array($result)){
+            $creative_hash4 = $result["hash"];
+            $file_extension4 = $result["ext"];
+        }
+    }
+    /*if($data["creative_type"] == 2 && $haveAtleastOneCreativeUrl1){
+        $banner_url = $data["creative_url2"];
+    }
+    if($data["creative_type2"] == 2 && $haveAtleastOneCreativeUrl2){
+        $banner_url2 = $data["creative_url2"];
+    }
+    if($data["creative_type3"] == 2 && $haveAtleastOneCreativeUrl3){
+        $banner_url3 = $data["creative_url2"];
+    }
+    if($data["creative_type4"] == 2 && $haveAtleastOneCreativeUrl4){
+        $banner_url4 = $data["creative_url2"];
+    }
+    */
+    if($data["creative_type"] == 3 && $haveAtleastOneCreativeHtml1){
+        $adv_chtml = $data["html_body"];
+    }
+    if($data["creative_type2"] == 3 && $haveAtleastOneCreativeHtml2){
+        $adv_chtml_2 = $data["html_body2"];
+    }
+    if($data["creative_type3"] == 3 && $haveAtleastOneCreativeHtml3){
+        $adv_chtml_3 = $data["html_body3"];
+    }
+    if($data["creative_type4"] == 3 && $haveAtleastOneCreativeHtml4){
+        $adv_chtml_4 = $data["html_body4"];
+    }
 }
-
-// End: Upload
-
-}
-// End Case: Remote Creative Server (FTP)
-
-// Case: Local Creative Server
-if (getconfig_var('default_creative_server')==1){
-	
-
-include MAD_PATH . '/modules/upload/class.upload.php';
-
-
-$handle = new Upload($_FILES['creative_file']);
-$handle->allowed = array('image/*');
-$handle->file_new_name_body = $creative_hash;
-
- if ($handle->uploaded) {
-	 	 
-$image_width = $handle->image_src_x;
-$image_height = $handle->image_src_y;
-
-if ((!empty($image_width) && !empty($image_height)) && ($image_height!=$data['custom_creative_height'] or $image_width!=$data['custom_creative_width'])){
-global $errormessage;
-$errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload an image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
-global $editdata;
-$editdata=$data;
-return false;
-}
-	
-
-$handle->Process(MAD_PATH . MAD_CREATIVE_DIR);
-
-
- if ($handle->processed) {
-// OK 
- }
- else {
-global $errormessage;
-$errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
-global $editdata;
-$editdata=$data;
-return false;
- }
- 
- } else {
-	 // Not OK
-
-global $errormessage;
-$errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
-global $editdata;
-$editdata=$data;
-return false;
-	 
- }
- 
-}
- // End Case: Local Creative Sercer 
-}
-
-
-
 // END CREATIVE UPLOAD
 }
 
@@ -3085,14 +3350,42 @@ $created_campaign_id=mysql_insert_id($maindb);
 insertDeviceTargeting($targetDevices, $created_campaign_id, $maindb, $data);
 
 if ($data['campaign_type']!='network'){
-	if ($data['creative_type']==1){
-	$creative_server=getconfig_var('default_creative_server');	
-	}
+    if ($data['creative_type']==1){
+        $creative_server=getconfig_var('default_creative_server');	
+    }
 // Insert Ad Unit into DB
 if (!isset($creative_server)){$creative_server='';}
+
 if (!isset($creative_hash)){$creative_hash='';}
+if (!isset($creative_hash2)){$creative_hash2='';}
+if (!isset($creative_hash3)){$creative_hash3='';}
+if (!isset($creative_hash4)){$creative_hash4='';}
+
 if (!isset($file_extension)){$file_extension='';}
-if (!isset($data['adv_mraid'])){$data['adv_mraid']='';}
+if (!isset($file_extension2)){$file_extension2='';}
+if (!isset($file_extension3)){$file_extension3='';}
+if (!isset($file_extension4)){$file_extension4='';}
+
+if (!isset($adv_chtml)){$adv_chtml='';}
+if (!isset($adv_chtml_2)){$adv_chtml_2='';}
+if (!isset($adv_chtml_3)){$adv_chtml_3='';}
+if (!isset($adv_chtml_4)){$adv_chtml_4='';}
+
+if(!isset($data['adv_mraid'])){$data['adv_mraid'] = '';}
+if(!isset($data['adv_mraid2'])){$data['adv_mraid2'] = '';}
+if(!isset($data['adv_mraid3'])){$data['adv_mraid3'] = '';}
+if(!isset($data['adv_mraid4'])){$data['adv_mraid4'] = '';}
+
+if(!isset($data["click_url"])){$data["click_url"] = "";}
+if(!isset($data["click_url2"])){$data["click_url2"] = "";}
+if(!isset($data["click_url3"])){$data["click_url3"] = "";}
+if(!isset($data["click_url4"])){$data["click_url4"] = "";}
+
+if($data["creative_format"] == 11){
+    $data["click_url"] = $data["click_url_text"];
+}
+
+
 
 $data['creative_type']=sanitize($data['creative_type']);
 $data['click_url']=sanitize($data['click_url']);
@@ -3102,10 +3395,34 @@ $data['tracking_pixel']=sanitize($data['tracking_pixel']);
 $data['adv_name']=sanitize($data['adv_name']);
 $data['custom_creative_height']=sanitize($data['custom_creative_height']);
 $data['custom_creative_width']=sanitize($data['custom_creative_width']);
-$data['adv_mraid']=sanitize($data['adv_mraid']);
 
-mysql_query("INSERT INTO md_ad_units (campaign_id, unit_hash, adv_type, adv_status, adv_click_url, adv_click_opentype, adv_chtml, adv_bannerurl, adv_impression_tracking_url, adv_name, adv_clickthrough_type, adv_creative_extension, adv_height, adv_width, creativeserver_id, adv_mraid)
-VALUES ('$created_campaign_id', '$creative_hash', '$data[creative_type]', '1', '$data[click_url]', '', '$data[html_body]', '$data[creative_url]', '$data[tracking_pixel]', '$data[adv_name]', '', '$file_extension', '$data[custom_creative_height]', '$data[custom_creative_width]', '$creative_server', '$data[adv_mraid]')", $maindb);
+$data['adv_mraid']=sanitize($data['adv_mraid']);
+$data['adv_mraid2']=sanitize($data['adv_mraid2']);
+$data['adv_mraid3']=sanitize($data['adv_mraid3']);
+$data['adv_mraid4']=sanitize($data['adv_mraid4']);
+
+$data['click_url']=sanitize($data['click_url']);
+$data['click_url2']=sanitize($data['click_url2']);
+$data['click_url3']=sanitize($data['click_url3']);
+$data['click_url4']=sanitize($data['click_url4']);
+
+$adv_chtml = sanitize($adv_chtml);
+$adv_chtml_2 = sanitize($adv_chtml_2);
+$adv_chtml_3 = sanitize($adv_chtml_3);
+$adv_chtml_4 = sanitize($adv_chtml_4);
+
+
+mysql_query("INSERT INTO md_ad_units (campaign_id, unit_hash, adv_type, adv_status, adv_click_url, adv_click_opentype, adv_chtml,
+    adv_bannerurl, adv_impression_tracking_url, adv_name, adv_clickthrough_type, adv_creative_extension, adv_height, adv_width, 
+    creativeserver_id, adv_mraid,banner_url2,banner_url3,banner_url4,small_img_url,ad_description,click_url_2,click_url_3,
+    click_url_4,unit_hash_2,unit_hash_3,unit_hash_4,adv_creative_extension2,adv_creative_extension3,adv_creative_extension4,
+    adv_chtml_2,adv_chtml_3,adv_chtml_4,adv_mraid_2,adv_mraid_3,adv_mraid_4)
+VALUES ('$created_campaign_id', '$creative_hash', '$data[creative_type]', '1', '$data[click_url]', '', '$data[html_body]', "
+        . "'$data[creative_url]', '$data[tracking_pixel]', '$data[adv_name]', '', '$file_extension', '$data[custom_creative_height]',"
+        . " '$data[custom_creative_width]', '$creative_server', '$data[adv_mraid]','$data[creative_url2]','$data[creative_url3]',"
+        . "'$data[creative_url4]','$smallImgUrl','$data[ad_description]','$data[click_url2]','$data[click_url3]','$data[click_url4]',"
+        . "'$creative_hash2','$creative_hash3','$creative_hash4','$file_extension2','$file_extension3','$file_extension4','$adv_chtml_2',"
+        . "'$adv_chtml_3','$adv_chtml_4','$data[adv_mraid2]','$data[adv_mraid3]','$data[adv_mraid4]')", $maindb);
 global $created_adunit_id;
 $created_adunit_id=mysql_insert_id($maindb);
 // END: Insert Ad Unit into DB

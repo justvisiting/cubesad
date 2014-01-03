@@ -288,7 +288,7 @@ $editdata=$data;
 return false;		
 }
 
-mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
+/*mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
   `adv_id` int(11) NOT NULL auto_increment,
   `campaign_id` varchar(100) NOT NULL,
   `unit_hash` varchar(100) NOT NULL,
@@ -308,7 +308,51 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
   `creativeserver_id` varchar(100) NOT NULL,
   PRIMARY KEY  (`adv_id`),
   KEY `campaign_id` (`campaign_id`,`adv_status`,`adv_height`,`adv_width`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);*/
+
+
+// added some fields : banner_url2, banner_url3, banner_url4, small_img_url, ad_description, click_url_2, click_url_3, click_url_4 and many more.
+mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
+  `adv_id` int(11) NOT NULL AUTO_INCREMENT,
+  `campaign_id` varchar(100) NOT NULL,
+  `unit_hash` varchar(100) NOT NULL,
+  `adv_type` varchar(100) NOT NULL,
+  `adv_status` varchar(100) NOT NULL,
+  `adv_click_url` longtext NOT NULL,
+  `adv_click_opentype` varchar(100) NOT NULL,
+  `adv_chtml` longtext NOT NULL,
+  `adv_mraid` varchar(1) NOT NULL,
+  `adv_bannerurl` longtext NOT NULL,
+  `adv_impression_tracking_url` longtext NOT NULL,
+  `adv_name` varchar(100) NOT NULL,
+  `adv_clickthrough_type` varchar(100) NOT NULL,
+  `adv_creative_extension` varchar(100) NOT NULL,
+  `adv_height` varchar(100) NOT NULL,
+  `adv_width` varchar(100) NOT NULL,
+  `creativeserver_id` varchar(100) NOT NULL,
+  `banner_url2` longtext NOT NULL,
+  `banner_url3` longtext NOT NULL,
+  `banner_url4` longtext NOT NULL,
+  `small_img_url` longtext NOT NULL,
+  `ad_description` varchar(100) NOT NULL,
+  `click_url_2` longtext NOT NULL,
+  `click_url_3` longtext NOT NULL,
+  `click_url_4` longtext NOT NULL,
+  `unit_hash_2` varchar(100) NOT NULL,
+  `unit_hash_3` varchar(100) NOT NULL,
+  `unit_hash_4` varchar(100) NOT NULL,
+  `adv_creative_extension2` varchar(100) NOT NULL,
+  `adv_creative_extension3` varchar(100) NOT NULL,
+  `adv_creative_extension4` varchar(100) NOT NULL,
+  `adv_chtml_2` longtext NOT NULL,
+  `adv_chtml_3` longtext NOT NULL,
+  `adv_chtml_4` longtext NOT NULL,
+  `adv_mraid_2` varchar(1) NOT NULL,
+  `adv_mraid_3` varchar(1) NOT NULL,
+  `adv_mraid_4` varchar(1) NOT NULL,
+  PRIMARY KEY (`adv_id`),
+  KEY `campaign_id` (`campaign_id`,`adv_status`,`adv_height`,`adv_width`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);
 
 mysql_query("CREATE TABLE IF NOT EXISTS `md_campaigns` (
   `campaign_id` int(11) NOT NULL auto_increment,

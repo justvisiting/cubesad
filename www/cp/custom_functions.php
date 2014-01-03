@@ -455,3 +455,86 @@ function mapCampaignAndDevice($camp_id,$currentDevice,$currentOs){
     }
     return $isCampaingForDevice;
 }
+
+function uploadFileAtLocalOrServer($fileName,$data,$checkDimension = true){
+    $uniqid = uniqid(time());
+    $creative_hash=md5($uniqid);
+    $file_extension=strtolower(substr(strrchr($_FILES[$fileName]['name'], "."), 1));
+    // Case: Remote Creative Server (FTP)
+    if (getconfig_var('default_creative_server')>1){
+        list($width, $height, $type, $attr)= getimagesize($_FILES[$fileName]['tmp_name']);
+        if ($checkDimension &&  ($height!=$data['custom_creative_height'] or $width!=$data['custom_creative_width'] or empty($file_extension))){
+            global $errormessage;
+            $errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload a valid image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
+            global $editdata;
+            $editdata=$data;
+            return false;
+        }
+        $creative_server_detail = get_creativeserver_detail(getconfig_var('default_creative_server'));
+        if ($creative_server_detail['entry_id']<1){
+            global $errormessage;
+            $errormessage='The default creative server does not seem to exist. Please change your creative server in your mAdserve control panel under Configuration>Creative Servers';
+            global $editdata;
+            $editdata=$data;
+            return false;
+        }
+        // Attempt: Add FTP library
+        include_once MAD_PATH . '/modules/ftp/ftp.class.php';
+        try {
+            $ftp = new Ftp;
+            $ftp->connect($creative_server_detail['remote_host']);
+            $ftp->login($creative_server_detail[remote_user], $creative_server_detail[remote_password]); 
+            $ftp->put($creative_server_detail[remote_directory] . $creative_hash . '.' . $file_extension , $_FILES[$fileName]['tmp_name'], FTP_BINARY);
+            return array(
+                    "ext" =>  $file_extension,
+                    "hash" => $creative_hash
+                );
+
+        } catch (FtpException $e) {
+            global $errormessage;
+            $errormessage='FTP Client was unable to upload creative to remote server. Error given: '.$e->getMessage().'';
+            global $editdata;
+            $editdata=$data;
+            return false;
+        }
+    }
+    if (getconfig_var('default_creative_server')==1){
+        // Attempt: Add Upload library
+        include_once MAD_PATH . '/modules/upload/class.upload.php';
+        $handle = new Upload($_FILES[$fileName]);
+        $handle->allowed = array('image/*');
+        $handle->file_new_name_body = $creative_hash;
+        if ($handle->uploaded) {
+            $image_width = $handle->image_src_x;
+            $image_height = $handle->image_src_y;
+            if ($checkDimension && (!empty($image_width) && !empty($image_height)) && ($image_height!=$data['custom_creative_height'] or $image_width!=$data['custom_creative_width'])){
+                global $errormessage;
+                $errormessage='The image you uploaded does not appear to be in the right dimensions. Please upload an image sized '.$data['custom_creative_width'].'x'.$data['custom_creative_height'].'';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+            $handle->Process(MAD_PATH . MAD_CREATIVE_DIR);
+            if ($handle->processed) {
+                return array(
+                    "ext" =>  $file_extension,
+                    "hash" => $creative_hash
+                );
+                // FILE UPLOAD OK 
+            }else{
+                global $errormessage;
+                $errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
+                global $editdata;
+                $editdata=$data;
+                return false;
+            }
+        }else{
+            // not okay
+            global $errormessage;
+            $errormessage='Creative could not be uploaded. Please check if your creative directory is writeable ('.MAD_CREATIVE_DIR.') and that you have uploaded a valid image file.';
+            global $editdata;
+            $editdata=$data;
+            return false;
+        }
+    }
+}

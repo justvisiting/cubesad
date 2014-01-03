@@ -1,3 +1,6 @@
+<link rel="stylesheet" type="text/css" href="assets/javascripts/plugins/autocomplete/autoSuggest.css">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+<script src="assets/javascripts/jquery-1.7.1.min.js"></script>
 <?php
 global $current_section;
 $current_section='campaigns';
