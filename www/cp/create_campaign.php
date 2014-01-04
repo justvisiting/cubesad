@@ -40,7 +40,39 @@ $added=2;
 }
 }
 
-
+if($added == 2){
+    $editdata=$_POST;
+    $radioGroup1Button1 = $_POST["creative_type"] == 1;
+    $radioGroup1Button2 = $_POST["creative_type"] == 2;
+    $radioGroup1Button3 = $_POST["creative_type"] == 3;
+    
+    $radioGroup2Button1 = $_POST["creative_type2"] == 1;
+    $radioGroup2Button2 = $_POST["creative_type2"] == 2;
+    $radioGroup2Button3 = $_POST["creative_type2"] == 3;
+    
+    $radioGroup3Button1 = $_POST["creative_type3"] == 1;
+    $radioGroup3Button2 = $_POST["creative_type3"] == 2;
+    $radioGroup3Button3 = $_POST["creative_type3"] == 3;
+    
+    $radioGroup4Button1 = $_POST["creative_type4"] == 1;
+    $radioGroup4Button2 = $_POST["creative_type4"] == 2;
+    $radioGroup4Button3 = $_POST["creative_type4"] == 3;
+    
+}
+if(!isset($_POST["add"])){
+    if(!($radioGroup1Button1 || $radioGroup1Button2 || $radioGroup1Button3)){
+        $radioGroup1Button1 = true;
+    }
+    if(!($radioGroup2Button1 || $radioGroup2Button2 || $radioGroup2Button3)){
+        $radioGroup2Button1 = true;
+    }
+    if(!($radioGroup3Button1 || $radioGroup3Button2 || $radioGroup3Button3)){
+        $radioGroup3Button1 = true;
+    }
+    if(!($radioGroup4Button1 || $radioGroup4Button2 || $radioGroup4Button3)){
+        $radioGroup4Button1 = true;
+    }
+}
 
 require_once MAD_PATH . '/www/cp/templates/header.tpl.php';
 

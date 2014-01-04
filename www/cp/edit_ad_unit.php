@@ -36,24 +36,103 @@ $edited=2;
 
 
 if ($edited!=2){
-$editdata=get_adunit_detail($_GET['id']);
-$editdata['creative_type']=$editdata['adv_type'];
-$editdata['custom_creative_width']=$editdata['adv_width'];
-$editdata['custom_creative_height']=$editdata['adv_height'];
-$editdata['click_url']=$editdata['adv_click_url'];
-$editdata['tracking_pixel']=$editdata['adv_impression_tracking_url'];
-$editdata['creative_url']=$editdata['adv_bannerurl'];
-$editdata['html_body']=$editdata['adv_chtml'];
+    $editdata=get_adunit_detail($_GET['id']);
+    $editdata['creative_type']=$editdata['adv_type'];
+    $editdata['custom_creative_width']=$editdata['adv_width'];
+    $editdata['custom_creative_height']=$editdata['adv_height'];
+    
+    $editdata['click_url']=$editdata['adv_click_url'];
+    $editdata['tracking_pixel']=$editdata['adv_impression_tracking_url'];
+    $editdata['creative_url']=$editdata['adv_bannerurl'];
+    $editdata['html_body']=$editdata['adv_chtml'];
+    $editdata["adv_mraid"] = $editdata["adv_mraid"];
+    
+    $radioGroup1Button1 =  isset($editdata["unit_hash"]) && strlen($editdata['unit_hash']) >0 ;
+    $radioGroup1Button2 = isset($editdata['adv_bannerurl']) && strlen($editdata['adv_bannerurl']) >0 ;
+    $radioGroup1Button3 = isset($editdata['adv_chtml']) && strlen($editdata['adv_chtml']) >0 ;
+    
+    $radioGroup2Button1 =  isset($editdata["unit_hash_2"]) && strlen($editdata['unit_hash_2']) >0 ;
+    $radioGroup2Button2 = isset($editdata['banner_url2']) && strlen($editdata['banner_url2']) >0 ;
+    $radioGroup2Button3 = isset($editdata['adv_chtml_2']) && strlen($editdata['adv_chtml_2']) >0 ;
+    
+    $radioGroup3Button1 =  isset($editdata["unit_hash_3"]) && strlen($editdata['unit_hash_3']) >0 ;
+    $radioGroup3Button2 = isset($editdata['banner_url3']) && strlen($editdata['banner_url3']) >0 ;
+    $radioGroup3Button3 = isset($editdata['adv_chtml_3']) && strlen($editdata['adv_chtml_3']) >0 ;
+    
+    $radioGroup4Button1 =  isset($editdata["unit_hash_4"]) && strlen($editdata['unit_hash_4']) >0 ;
+    $radioGroup4Button2 = isset($editdata['banner_url4']) && strlen($editdata['banner_url4']) >0 ;
+    $radioGroup4Button3 = isset($editdata['adv_chtml_4']) && strlen($editdata['adv_chtml_4']) >0 ;
+    
+    
+    // custom data
+    $editdata["creative_format"] = $editdata["creative_format"];
+    $editdata["ad_description"] = $editdata["ad_description"];
+    
+    // 2nd upload container.
+    $editdata['creative_url2']=$editdata['banner_url2'];
+    $editdata['html_body2']=$editdata['adv_chtml_2'];
+    $editdata['click_url2']=$editdata['click_url_2'];
+    
+    // 3rd upload container.
+    $editdata['creative_url3']=$editdata['banner_url3'];
+    $editdata['html_body3']=$editdata['adv_chtml_3'];
+    $editdata['click_url3']=$editdata['click_url_3'];
+    
+    // 4rd upload container.
+    $editdata['creative_url4']=$editdata['banner_url4'];
+    $editdata['html_body4']=$editdata['adv_chtml_4'];
+    $editdata['click_url4']=$editdata['click_url_4'];
+    
+    
+    //checkboxs under html container.
+    $editdata["adv_mraid2"] = $editdata["adv_mraid_2"];
+    $editdata["adv_mraid3"] = $editdata["adv_mraid_3"];
+    $editdata["adv_mraid4"] = $editdata["adv_mraid_4"];
+}else{
+    // error occur on page
+    // redirect to the same page.
+    $editdata=$_POST;
+    $radioGroup1Button1 = $_POST["creative_type"] == 1;
+    $radioGroup1Button2 = $_POST["creative_type"] == 2;
+    $radioGroup1Button3 = $_POST["creative_type"] == 3;
+    
+    $radioGroup2Button1 = $_POST["creative_type2"] == 1;
+    $radioGroup2Button2 = $_POST["creative_type2"] == 2;
+    $radioGroup2Button3 = $_POST["creative_type2"] == 3;
+    
+    $radioGroup3Button1 = $_POST["creative_type3"] == 1;
+    $radioGroup3Button2 = $_POST["creative_type3"] == 2;
+    $radioGroup3Button3 = $_POST["creative_type3"] == 3;
+    
+    $radioGroup4Button1 = $_POST["creative_type4"] == 1;
+    $radioGroup4Button2 = $_POST["creative_type4"] == 2;
+    $radioGroup4Button3 = $_POST["creative_type4"] == 3;
+    
+    
 }
 
+if(!isset($_POST["update"])){
+    if(!($radioGroup1Button1 || $radioGroup1Button2 || $radioGroup1Button3)){
+        $radioGroup1Button1 = true;
+    }
+    if(!($radioGroup2Button1 || $radioGroup2Button2 || $radioGroup2Button3)){
+        $radioGroup2Button1 = true;
+    }
+    if(!($radioGroup3Button1 || $radioGroup3Button2 || $radioGroup3Button3)){
+        $radioGroup3Button1 = true;
+    }
+    if(!($radioGroup4Button1 || $radioGroup4Button2 || $radioGroup4Button3)){
+        $radioGroup4Button1 = true;
+    }
+}
 
 require_once MAD_PATH . '/www/cp/templates/header.tpl.php';
 
 
 
 ?>
-
-<script language="JavaScript">  
+<script src="assets/javascripts/jquery-1.7.1.min.js"></script>
+<script language="JavaScript">
 
 function showadiv(id) {  
 //safe function to show an element with a specified id
@@ -110,7 +189,7 @@ function hideadiv(id) {
 				<form method="post" enctype="multipart/form-data" id="crudcampaign" name="crudcampaign" class="form uniformForm">
                 <input type="hidden" name="update" value="1" />	
 					
-				<?php require_once MAD_PATH . '/www/cp/templates/forms/crud.adunit.tpl.php';
+				<?php require_once MAD_PATH . '/www/cp/templates/forms/crud.edit_adunit.tpl.php';
 				
 				?>	
                 
@@ -131,11 +210,11 @@ function hideadiv(id) {
              
 <script>
 <?php if ($editdata['creative_type']==2){ 
-echo "creative_type('external');";
+//echo "creative_type('external');";
 } else if ($editdata['creative_type']==3){ 
-echo "creative_type('html');";
+//echo "creative_type('html');";
 } else {
-echo "creative_type('upload');";
+//echo "creative_type('upload');";
 }
 
 ?>
