@@ -313,6 +313,10 @@ function print_ad(){
 global $display_ad;	
 global $request_settings;
 
+/*if(!generateCustomAdsXML($display_ad["ad_id"],$request_settings)){
+    return;
+}*/
+
 if ($display_ad['main_type']=='display'){
 	
 switch ($request_settings['response_type']){
@@ -1786,5 +1790,161 @@ break;
 	
 }
 
+// edit by raj..
 
+/*function generateCustomAdsXML($adId,$resultType){
+    // get the ad creative_format
+    $adUnitDetails = get_adunit_detail($adId);
+    if(isset($adUnitDetails["creative_format"]) && $adUnitDetails["creative_format"] > 10){
+        prepare_ctr();
+        global $display_ad;
+        switch ($resultType['response_type']){
+            case 'xml':
+                $adType = "";
+                $textNode = "";
+                $urlType = "";
+                $clickType = "<clicktype>inapp</clicktype>";
+                $clickUrl = "<clickurl><![CDATA[{$display_ad['final_click_url']}]]></clickurl>";//prepare_ctr();
+                $img = "";
+                $htmlString = "";
+                //text ad
+                if($adUnitDetails["creative_format"] == 11){
+                    $adType = "textAd";
+                    $urlType = "<urltype>link</urltype>";
+                    $textNode = "<text>{$adUnitDetails["ad_description"]}</text>";
+                }
+                //banner ad
+                else if($adUnitDetails["creative_format"] == 12){
+                    $adType = "bannerAd";
+                    $urlType = "<urltype>link</urltype>";
+                    if(isset($adUnitDetails["unit_hash"]) && strlen($adUnitDetails["unit_hash"]) > 0){
+                        $img = "<img><![CDATA[" . get_creative_url($adUnitDetails) . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_bannerurl"]) && strlen($adUnitDetails["adv_bannerurl"]) > 0){
+                        $img = "<img><![CDATA[" . $adUnitDetails["adv_bannerurl"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml"]) && strlen($adUnitDetails["adv_chtml"]) > 0){
+                        $htmlString = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml"] . "]]></htmlString>";
+                    }
+                }
+                //Interstitial ad
+                else if($adUnitDetails["creative_format"] == 13){
+                    $adType = "interstitialAd";
+                    $urlType = "<urltype>link</urltype>";
+                    if(isset($adUnitDetails["unit_hash"]) && strlen($adUnitDetails["unit_hash"]) > 0){
+                        $img = "<img><![CDATA[" . get_creative_url($adUnitDetails) . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_bannerurl"]) && strlen($adUnitDetails["adv_bannerurl"]) > 0){
+                        $img = "<img><![CDATA[" . $adUnitDetails["adv_bannerurl"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml"]) && strlen($adUnitDetails["adv_chtml"]) > 0){
+                        $htmlString = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml"] . "]]></htmlString>";
+                    }
+                }
+                //logo ad
+                else if($adUnitDetails["creative_format"] == 14){
+                    $adType = "logoAd";
+                    $urlType = "<urltype>link</urltype>";
+                    if(isset($adUnitDetails["unit_hash"]) && strlen($adUnitDetails["unit_hash"]) > 0){
+                        $img = "<img><![CDATA[" . get_creative_url($adUnitDetails) . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_bannerurl"]) && strlen($adUnitDetails["adv_bannerurl"]) > 0){
+                        $img = "<img><![CDATA[" . $adUnitDetails["adv_bannerurl"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml"]) && strlen($adUnitDetails["adv_chtml"]) > 0){
+                        $htmlString = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml"] . "]]></htmlString>";
+                    }
+                }
+                //Multipart Text ad
+                else if($adUnitDetails["creative_format"] == 15){
+                    $textNode = "<text>{$adUnitDetails["ad_description"]}</text>";
+                    $adType = "multiPartTextAd";
+                    if(isset($adUnitDetails["unit_hash"]) && strlen($adUnitDetails["unit_hash"]) > 0){
+                        $img1 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash","adv_creative_extension") . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_bannerurl"]) && strlen($adUnitDetails["adv_bannerurl"]) > 0){
+                        $img1 = "<img><![CDATA[" . $adUnitDetails["adv_bannerurl"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml"]) && strlen($adUnitDetails["adv_chtml"]) > 0){
+                        $html1 = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml"] . "]]></htmlString>";
+                    }
+                    // start with here...
+                    if(isset($adUnitDetails["unit_hash_2"]) && strlen($adUnitDetails["unit_hash_2"]) > 0){
+                        $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
+                    }if(isset($adUnitDetails["unit_hash_3"]) && strlen($adUnitDetails["unit_hash_3"]) > 0){
+                        $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
+                    }if(isset($adUnitDetails["unit_hash_4"]) && strlen($adUnitDetails["unit_hash_4"]) > 0){
+                        $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    }
+                    
+                    $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
+                    $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
+                    $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    $htmlString = "<expand></expand>";
+                    $img = "<expand> <!-- max there will be 4 images -->
+                            $img1
+                            $img2
+                            $img3
+                            $img4
+                            </expand>";
+                     $urlType = "<urltype>call</urltype>";
+                }
+                //Multipart Banner ad
+                else if($adUnitDetails["creative_format"] == 16){
+                    $adType = "multiPartBannerAd";
+                    $smallImg = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"small_img_url","") . "]]></img>";
+                    $img1 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash","adv_creative_extension") . "]]></img>";
+                    $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
+                    $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
+                    $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    
+                    $img = "$smallImg
+                            <expand> <!-- max there will be 4 images -->
+                                $img1
+                                $img2
+                                $img3
+                                $img4
+                            </expand>";
+                    $urlType = "<urltype>playStore</urltype>";
+                }
+                //Multipart Interstitial ad
+                else if($adUnitDetails["creative_format"] == 17){
+                    $adType = "multiPartLogoAd";
+                    $img1 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash","adv_creative_extension") . "]]></img>";
+                    $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
+                    $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
+                    $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    $img = "<expand> <!-- max there will be 4 images -->
+                            $img1
+                            $img2
+                            $img3
+                            $img4
+                            </expand>";
+                    $urlType = "<urltype>playStore</urltype>";
+                }
+                echo <<<EOT
+                <?xml version="1.0" encoding="UTF-8" ?>
+                <request type="$adType">
+                {$htmlString}
+                {$textNode}
+                {$img}
+                {$clickType}
+                {$clickUrl}
+                {$urlType}
+                <clicktype>inapp</clicktype>
+                <refresh>30</refresh>
+                <scale>no</scale>
+                <skippreflight>no</skippreflight>
+                </request>
+EOT;
+                    
+            break;
+        }
+        return true;
+    }
+    return false;
+}
+
+function getCreativeUrl($content,$hash,$ext){
+    if ($content['creativeserver_id']==1){
+        //$image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF'])."".MAD_CREATIVE_DIR."".$content['unit_hash'].".".$content['adv_creative_extension']."";
+        $image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/')."".MAD_CREATIVE_DIR."".$content[$hash].".".$content[$ext]."";
+    }else {
+        $server_detail=get_creativeserver($content['creativeserver_id']);
+        $image_url="".$server_detail['server_default_url']."".$content[$hash].".".$content[$ext].""; 
+    }
+    return $image_url;
+}*/
 ?>

@@ -28,19 +28,52 @@ global $page_desc;
 $page_desc='create_adunit';
 
 if (isset($_POST['add'])){
+    if (do_create('ad_unit', $_POST, '') && is_numeric($_GET['id'])){
+        global $added;
+        $added=1;
+        //MAD_Admin_Redirect::redirect('view_adunits.php?id='.$_GET['id'].'&added=1');
+        echo '<META HTTP-EQUIV="Refresh" Content="0; URL=view_adunits.php?id=' . $_GET['id'] . '">';exit;
+    }else{
+        global $added;
+        $added=2;
+    }
+    // error occur on page
+    // redirect to the same page.
+}
 
-if (do_create('ad_unit', $_POST, '') && is_numeric($_GET['id'])){
-global $added;
-$added=1;
-MAD_Admin_Redirect::redirect('view_adunits.php?id='.$_GET['id'].'&added=1');	
+if($added == 2){
+    $editdata=$_POST;
+    $radioGroup1Button1 = $_POST["creative_type"] == 1;
+    $radioGroup1Button2 = $_POST["creative_type"] == 2;
+    $radioGroup1Button3 = $_POST["creative_type"] == 3;
+    
+    $radioGroup2Button1 = $_POST["creative_type2"] == 1;
+    $radioGroup2Button2 = $_POST["creative_type2"] == 2;
+    $radioGroup2Button3 = $_POST["creative_type2"] == 3;
+    
+    $radioGroup3Button1 = $_POST["creative_type3"] == 1;
+    $radioGroup3Button2 = $_POST["creative_type3"] == 2;
+    $radioGroup3Button3 = $_POST["creative_type3"] == 3;
+    
+    $radioGroup4Button1 = $_POST["creative_type4"] == 1;
+    $radioGroup4Button2 = $_POST["creative_type4"] == 2;
+    $radioGroup4Button3 = $_POST["creative_type4"] == 3;
+    
 }
-else
-{
-global $added;
-$added=2;
+if(!isset($_POST["add"])){
+    if(!($radioGroup1Button1 || $radioGroup1Button2 || $radioGroup1Button3)){
+        $radioGroup1Button1 = true;
+    }
+    if(!($radioGroup2Button1 || $radioGroup2Button2 || $radioGroup2Button3)){
+        $radioGroup2Button1 = true;
+    }
+    if(!($radioGroup3Button1 || $radioGroup3Button2 || $radioGroup3Button3)){
+        $radioGroup3Button1 = true;
+    }
+    if(!($radioGroup4Button1 || $radioGroup4Button2 || $radioGroup4Button3)){
+        $radioGroup4Button1 = true;
+    }
 }
-}
-
 $campaign_detail=get_campaign_detail($_GET['id']);
 
 
@@ -128,11 +161,11 @@ function hideadiv(id) {
              
 <script>
 <?php if (isset ($editdata['creative_type']) && $editdata['creative_type']==2){ 
-echo "creative_type('external');";
+//echo "creative_type('external');";
 } else if (isset ($editdata['creative_type']) && $editdata['creative_type']==3){ 
-echo "creative_type('html');";
+//echo "creative_type('html');";
 } else {
-echo "creative_type('upload');";
+//echo "creative_type('upload');";
 }
 
 ?>

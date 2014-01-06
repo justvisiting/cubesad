@@ -20,7 +20,7 @@
             document.getElementById('html_div').style.display='none'; 
             document.getElementById('creative_upload_div').style.display='block';
             document.getElementById('creative_upload_div').style.display='block';
-            document.getElementById('click_url_div').style.display='block';
+            //document.getElementById('click_url_div').style.display='block';
 	}
 	
 	if (status=="external"){
@@ -30,14 +30,14 @@
             document.getElementById('creative_url_div').style.display='block'; 
             document.getElementById('creative_upload_div').style.display='block'; 
             document.getElementById('creative_upload_div').style.display='none'; 
-            document.getElementById('click_url_div').style.display='block';	
+            //document.getElementById('click_url_div').style.display='block';	
         }
 	
 	if (status=="html"){
             $("#creative_type_html").attr("checked", "true");
             document.getElementById('creative_upload_div').style.display='none';
             document.getElementById('creative_url_div').style.display='none'; 
-            document.getElementById('click_url_div').style.display='none';
+            //document.getElementById('click_url_div').style.display='none';
             document.getElementById('html_div').style.display='block';
 	}
 	
@@ -46,21 +46,30 @@
     $(document).ready(function(){
         $("#creative_format").change(function(){
             $("#ad_desc_div").hide();
-            $("#click_url_div_text").hide();
-            
-            $("#img-group1").show();
+            //$("#click_url_div_text").hide();
             $("#smallImage").hide();
-            $("#accordion").hide();
+            $("#accordion").show();
+            var accordion = $( "#accordion" ).accordion();
+            accordion.find( ".ui-accordion-header:eq(1)" ).hide();
+            accordion.find( ".ui-accordion-header:eq(2)" ).hide();
+            accordion.find( ".ui-accordion-header:eq(3)" ).hide();
+            var active = accordion.accordion( "option", "active" );
+            if ( active >= 1 ) {
+                accordion.accordion( "option", "active", 0 );
+            }
             if($(this).val() == "11"){
-                $("#click_url_div_text").show();
+                //$("#click_url_div_text").show();
                 $("#ad_desc_div").show();
-                $("#img-group1").hide();
+                $("#accordion").hide();
             }
             if($(this).val() == 15){
                 $("#ad_desc_div").show();
             }
             if($(this).val() >= 15){
                 $("#accordion").show();
+                accordion.find( ".ui-accordion-header:eq(1)" ).show();
+                accordion.find( ".ui-accordion-header:eq(2)" ).show();
+                accordion.find( ".ui-accordion-header:eq(3)" ).show();
             }
             if($(this).val() == 16){
                 $("#smallImage").show();
@@ -146,7 +155,7 @@
                                 <br/><br/>
                             </div> <!-- .field-group -->
                             
-                            <div id="click_url_div_text" class="field-group" style="display: none;">
+                           <!--<div id="click_url_div_text" class="field-group" style="display: none;">
                                 <div class="field">
                                     <input type="text" value="<?php if (isset($editdata['click_url'])){ echo $editdata['click_url']; } ?>"  name="click_url_text" id="click_url_text" size="28" class="" />			
                                     <label for="click_url">Click URL</label>
@@ -155,20 +164,22 @@
                             <!---->
                             
                             <!---->
-                            <div id="img-group1" >
+                            <div id="accordion">
+                                <h3>Creative Upload 1</h3>
+                                <div id="img-group1" >
                                 <div class="field-group control-group inline">
                                     <div class="field">
-                                        <input type="radio" <?php echo $radioGroup1Button1 ? "checked" : ""; ?>  onclick="document.getElementById('creative_url_div').style.display='none'; document.getElementById('html_div').style.display='none'; document.getElementById('creative_upload_div').style.display='block'; document.getElementById('creative_upload_div').style.display='block'; document.getElementById('click_url_div').style.display='block';" name="creative_type" id="creative_type_upload" value="1" />
+                                        <input type="radio" <?php echo $radioGroup1Button1 ? "checked" : ""; ?>  onclick="document.getElementById('creative_url_div').style.display='none'; document.getElementById('html_div').style.display='none'; document.getElementById('creative_upload_div').style.display='block'; document.getElementById('creative_upload_div').style.display='block';" name="creative_type" id="creative_type_upload" value="1" />
                                             <label for="creative_type_upload">Creative Upload</label>
                                     </div>
                                     
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup1Button2 ? "checked" : ""; ?>  onclick="document.getElementById('creative_upload_div').style.display='none'; document.getElementById('html_div').style.display='none'; document.getElementById('creative_url_div').style.display='block'; document.getElementById('creative_upload_div').style.display='block'; document.getElementById('creative_upload_div').style.display='none'; document.getElementById('click_url_div').style.display='block';" name="creative_type" id="creative_type_url" value="2" />
+                                            <input type="radio" <?php echo $radioGroup1Button2 ? "checked" : ""; ?>  onclick="document.getElementById('creative_upload_div').style.display='none'; document.getElementById('html_div').style.display='none'; document.getElementById('creative_url_div').style.display='block'; document.getElementById('creative_upload_div').style.display='block'; document.getElementById('creative_upload_div').style.display='none';" name="creative_type" id="creative_type_url" value="2" />
                                             <label for="creative_type_url">External Image URL</label>
                                     </div>
                                     
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup1Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div').style.display='none'; document.getElementById('creative_url_div').style.display='none';  document.getElementById('click_url_div').style.display='none'; document.getElementById('html_div').style.display='block';" name="creative_type" id="creative_type_html" value="3" />
+                                            <input type="radio" <?php echo $radioGroup1Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div').style.display='none'; document.getElementById('creative_url_div').style.display='none'; document.getElementById('html_div').style.display='block';" name="creative_type" id="creative_type_html" value="3" />
                                             <label for="creative_type_html">HTML (MRAID supported)</label>
                                     </div>
                                     <div style="color:#999; font-size:11px;">Creative Type</div>
@@ -194,29 +205,21 @@
                                             <label for="html_body">HTML Body</label><br /><input <?php if (isset($editdata['adv_mraid']) && $editdata['adv_mraid']==1){echo 'checked="checked"'; } ?> type="checkbox" name="adv_mraid" id="adv_mraid" value="1" /> <label for="adv_mraid">This is an MRAID ad</label>
                                     </div>
                                 </div> <!-- .field-group -->
-                                <div id="click_url_div" class="field-group" style="display: <?php echo $radioGroup1Button2 || $radioGroup1Button1 ? "block" : "none"; ?>">
-                                    <div class="field">
-                                        <input type="text" value="<?php if (isset($editdata['click_url'])){ echo $editdata['click_url']; } ?>"  name="click_url" id="click_url" size="28" class="" />			
-                                        <label for="click_url">Click URL</label>
-                                    </div>
-                                </div> <!-- .field-group -->
+                                <br/><br/><br/><br/><br/><br/>
                             </div>
-                            
-                            
-                            <div id="accordion">
                                 <h3>Creative Upload 2</h3>
                             <div id="img-group2">
                                 <div class="field-group control-group inline">
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup2Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div2').style.display='none'; document.getElementById('html_div2').style.display='none'; document.getElementById('creative_upload_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='block'; document.getElementById('click_url_div2').style.display='block';" name="creative_type2" id="creative_type_upload2" value="1" />
+                                            <input type="radio" <?php echo $radioGroup2Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div2').style.display='none'; document.getElementById('html_div2').style.display='none'; document.getElementById('creative_upload_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='block';" name="creative_type2" id="creative_type_upload2" value="1" />
                                             <label for="creative_type_upload2">Creative Upload</label>
                                     </div>
                                     <div class="field">
-                                        <input type="radio" <?php echo $radioGroup2Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div2').style.display='none'; document.getElementById('html_div2').style.display='none'; document.getElementById('creative_url_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='none'; document.getElementById('click_url_div2').style.display='block';" name="creative_type2" id="creative_type_url2" value="2"  />
+                                        <input type="radio" <?php echo $radioGroup2Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div2').style.display='none'; document.getElementById('html_div2').style.display='none'; document.getElementById('creative_url_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='block'; document.getElementById('creative_upload_div2').style.display='none';" name="creative_type2" id="creative_type_url2" value="2"  />
                                             <label for="creative_type_url2">External Image URL</label>
                                     </div>
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup2Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div2').style.display='none'; document.getElementById('creative_url_div2').style.display='none';  document.getElementById('click_url_div2').style.display='none'; document.getElementById('html_div2').style.display='block';" name="creative_type2" id="creative_type_html2" value="3" />
+                                            <input type="radio" <?php echo $radioGroup2Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div2').style.display='none'; document.getElementById('creative_url_div2').style.display='none';document.getElementById('html_div2').style.display='block';" name="creative_type2" id="creative_type_html2" value="3" />
                                             <label for="creative_type_html2">HTML (MRAID supported)</label>
                                     </div>
                                     <div style="color:#999; font-size:11px;">Creative Type</div>
@@ -242,26 +245,27 @@
                                                 <label for="html_body2">HTML Body</label><br /><input <?php if (isset($editdata['adv_mraid_2']) && $editdata['adv_mraid_2']==1){echo 'checked="checked"'; } ?> type="checkbox" name="adv_mraid2" id="adv_mraid2" value="1" /> <label for="adv_mraid2">This is an MRAID ad</label>
                                         </div>
                                 </div> <!-- .field-group -->
-                                <div id="click_url_div2" class="field-group" style="display: <?php echo $radioGroup2Button2 || $radioGroup2Button1 ? "block" : "none"; ?>">
+                                <!--<div id="click_url_div2" class="field-group" style="display: <?php echo $radioGroup2Button2 || $radioGroup2Button1 ? "block" : "none"; ?>">
                                     <div class="field">
                                             <input type="text" value="<?php if (isset($editdata['click_url2'])){ echo $editdata['click_url2']; } ?>"  name="click_url2" id="click_url2" size="28" class="" />			
                                             <label for="click_url2">Click URL</label>
                                     </div>
                                 </div> <!-- .field-group -->
+                                <br/><br/><br/><br/><br/><br/>
                             </div>
                                 <h3>Creative Upload 3</h3>
                             <div id="img-group3">
                                 <div class="field-group control-group inline">
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup3Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div3').style.display='none'; document.getElementById('html_div3').style.display='none'; document.getElementById('creative_upload_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='block'; document.getElementById('click_url_div3').style.display='block';" name="creative_type3" id="creative_type_upload3" value="1" />
+                                            <input type="radio" <?php echo $radioGroup3Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div3').style.display='none'; document.getElementById('html_div3').style.display='none'; document.getElementById('creative_upload_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='block';" name="creative_type3" id="creative_type_upload3" value="1" />
                                             <label for="creative_type_upload3">Creative Upload</label>
                                     </div>
                                     <div class="field">
-                                        <input type="radio" <?php echo $radioGroup3Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div3').style.display='none'; document.getElementById('html_div3').style.display='none'; document.getElementById('creative_url_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='none'; document.getElementById('click_url_div3').style.display='block';" name="creative_type3" id="creative_type_url3" value="2" />
+                                        <input type="radio" <?php echo $radioGroup3Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div3').style.display='none'; document.getElementById('html_div3').style.display='none'; document.getElementById('creative_url_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='block'; document.getElementById('creative_upload_div3').style.display='none';" name="creative_type3" id="creative_type_url3" value="2" />
                                             <label for="creative_type_url3">External Image URL</label>
                                     </div>
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup3Button3 ? "checked" : ""; ?>  onclick="document.getElementById('creative_upload_div3').style.display='none'; document.getElementById('creative_url_div3').style.display='none';  document.getElementById('click_url_div3').style.display='none'; document.getElementById('html_div3').style.display='block';" name="creative_type3" id="creative_type_html3" value="3" />
+                                            <input type="radio" <?php echo $radioGroup3Button3 ? "checked" : ""; ?>  onclick="document.getElementById('creative_upload_div3').style.display='none'; document.getElementById('creative_url_div3').style.display='none'; document.getElementById('html_div3').style.display='block';" name="creative_type3" id="creative_type_html3" value="3" />
                                             <label for="creative_type_html3">HTML (MRAID supported)</label>
                                     </div>
                                     <div style="color:#999; font-size:11px;">Creative Type</div>
@@ -288,26 +292,27 @@
                                                 <label for="html_body3">HTML Body</label><br /><input <?php if (isset($editdata['adv_mraid3']) && $editdata['adv_mraid3']==1){echo 'checked="checked"'; } ?> type="checkbox" name="adv_mraid3" id="adv_mraid3" value="1" /> <label for="adv_mraid3">This is an MRAID ad</label>
                                         </div>
                                 </div> <!-- .field-group -->
-                                <div id="click_url_div3" class="field-group" style="display: <?php echo $radioGroup3Button2 || $radioGroup3Button1 ? "block" : "none"; ?>">
+                                <!--<div id="click_url_div3" class="field-group" style="display: <?php echo $radioGroup3Button2 || $radioGroup3Button1 ? "block" : "none"; ?>">
                                     <div class="field">
                                             <input type="text" value="<?php if (isset($editdata['click_url3'])){ echo $editdata['click_url3']; } ?>"  name="click_url3" id="click_url3" size="28" class="" />			
                                             <label for="click_url3">Click URL</label>
                                     </div>
                                 </div> <!-- .field-group -->
+                                <br/><br/><br/><br/><br/><br/>
                             </div>
                                 <h3>Creative Upload 4</h3>
                             <div id="img-group4">
                                 <div class="field-group control-group inline">
                                     <div class="field">
-                                            <input type="radio" <?php echo $radioGroup4Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div4').style.display='none'; document.getElementById('html_div4').style.display='none'; document.getElementById('creative_upload_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='block'; document.getElementById('click_url_div4').style.display='block';" name="creative_type4" id="creative_type_upload4" value="1" />
+                                            <input type="radio" <?php echo $radioGroup4Button1 ? "checked" : ""; ?> onclick="document.getElementById('creative_url_div4').style.display='none'; document.getElementById('html_div4').style.display='none'; document.getElementById('creative_upload_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='block';" name="creative_type4" id="creative_type_upload4" value="1" />
                                             <label for="creative_type_upload4">Creative Upload</label>
                                     </div>
                                     <div class="field">
-                                        <input type="radio" <?php echo $radioGroup4Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div4').style.display='none'; document.getElementById('html_div4').style.display='none'; document.getElementById('creative_url_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='none'; document.getElementById('click_url_div4').style.display='block';" name="creative_type4" id="creative_type_url4" value="2" />
+                                        <input type="radio" <?php echo $radioGroup4Button2 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div4').style.display='none'; document.getElementById('html_div4').style.display='none'; document.getElementById('creative_url_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='block'; document.getElementById('creative_upload_div4').style.display='none';" name="creative_type4" id="creative_type_url4" value="2" />
                                         <label for="creative_type_url4">External Image URL</label>
                                     </div>
                                     <div class="field">
-                                        <input type="radio" <?php echo $radioGroup4Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div4').style.display='none'; document.getElementById('creative_url_div4').style.display='none';  document.getElementById('click_url_div4').style.display='none'; document.getElementById('html_div4').style.display='block';" name="creative_type4" id="creative_type_html4" value="3"/>
+                                        <input type="radio" <?php echo $radioGroup4Button3 ? "checked" : ""; ?> onclick="document.getElementById('creative_upload_div4').style.display='none'; document.getElementById('creative_url_div4').style.display='none';document.getElementById('html_div4').style.display='block';" name="creative_type4" id="creative_type_html4" value="3"/>
                                         <label for="creative_type_html4">HTML (MRAID supported)</label>
                                     </div>
                                     <div style="color:#999; font-size:11px;">Creative Type</div>
@@ -334,20 +339,28 @@
                                                 <label for="html_body4">HTML Body</label><br /><input <?php if (isset($editdata['adv_mraid4']) && $editdata['adv_mraid4']==1){echo 'checked="checked"'; } ?> type="checkbox" name="adv_mraid4" id="adv_mraid4" value="1" /> <label for="adv_mraid4">This is an MRAID ad</label>
                                         </div>
                                 </div> <!-- .field-group -->
-                                <div id="click_url_div4" class="field-group" style="display: <?php echo $radioGroup4Button2 || $radioGroup4Button1 ? "block" : "none"; ?>">
+                                <!--<div id="click_url_div4" class="field-group" style="display: <?php echo $radioGroup4Button2 || $radioGroup4Button1 ? "block" : "none"; ?>">
                                     <div class="field">
                                             <input type="text" value="<?php if (isset($editdata['click_url4'])){ echo $editdata['click_url4']; } ?>"  name="click_url4" id="click_url4" size="28" class="" />			
                                             <label for="click_url4">Click URL</label>
                                     </div>
                                 </div> <!-- .field-group -->
+                                <br/><br/><br/><br/><br/><br/>
                             </div>
                             </div>
-                                <div id="tracking_pixel_div" class="field-group">
-                                    <div class="field">
-                                        <input type="text" value="<?php if ( isset($editdata['tracking_pixel'])){ echo $editdata['tracking_pixel']; } ?>"  name="tracking_pixel" id="tracking_pixel" size="28" class="" />			
-                                        <label for="tracking_pixel">Tracking Pixel URL</label>
-                                    </div>
-                                </div> <!-- .field-group -->
+                            <br/>
+                            <div id="click_url_div" class="field-group">
+                                <div class="field">
+                                    <input type="text" value="<?php if (isset($editdata['click_url'])){ echo $editdata['click_url']; } ?>"  name="click_url" id="click_url" size="28" class="" />			
+                                    <label for="click_url">Click URL</label>
+                                </div>
+                            </div> <!-- .field-group -->
+                            <div id="tracking_pixel_div" class="field-group">
+                                <div class="field">
+                                    <input type="text" value="<?php if ( isset($editdata['tracking_pixel'])){ echo $editdata['tracking_pixel']; } ?>"  name="tracking_pixel" id="tracking_pixel" size="28" class="" />			
+                                    <label for="tracking_pixel">Tracking Pixel URL</label>
+                                </div>
+                            </div> <!-- .field-group -->
                             
 							
 						</div> <!-- .widget-content -->
@@ -358,20 +371,29 @@
         $(document).ready(function(){
             $("#ad_desc_div").hide();
             $("#click_url_div_text").hide();
-            
-            $("#img-group1").show();
             $("#smallImage").hide();
-            $("#accordion").hide();
+            $("#accordion").show();
+            var accordion = $( "#accordion" ).accordion();
+            accordion.find( ".ui-accordion-header:eq(1)" ).hide();
+            accordion.find( ".ui-accordion-header:eq(2)" ).hide();
+            accordion.find( ".ui-accordion-header:eq(3)" ).hide();
+            var active = accordion.accordion( "option", "active" );
+            if ( active >= 1 ) {
+                accordion.accordion( "option", "active", 0 );
+            }
             if($("#creative_format").val() == "11"){
                 $("#click_url_div_text").show();
                 $("#ad_desc_div").show();
-                $("#img-group1").hide();
+                $("accordion").hide();
             }
             if($("#creative_format").val() == 15){
                 $("#ad_desc_div").show();
             }
             if($("#creative_format").val() >= 15){
                 $("#accordion").show();
+                accordion.find( ".ui-accordion-header:eq(1)" ).show();
+                accordion.find( ".ui-accordion-header:eq(2)" ).show();
+                accordion.find( ".ui-accordion-header:eq(3)" ).show();
             }
             if($("#creative_format").val() == 16){
                 $("#smallImage").show();

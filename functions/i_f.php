@@ -335,9 +335,6 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
   `banner_url4` longtext NOT NULL,
   `small_img_url` longtext NOT NULL,
   `ad_description` varchar(100) NOT NULL,
-  `click_url_2` longtext NOT NULL,
-  `click_url_3` longtext NOT NULL,
-  `click_url_4` longtext NOT NULL,
   `unit_hash_2` varchar(100) NOT NULL,
   `unit_hash_3` varchar(100) NOT NULL,
   `unit_hash_4` varchar(100) NOT NULL,
@@ -350,6 +347,7 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_ad_units` (
   `adv_mraid_2` varchar(1) NOT NULL,
   `adv_mraid_3` varchar(1) NOT NULL,
   `adv_mraid_4` varchar(1) NOT NULL,
+  `creative_format` int(2) NOT NULL,
   PRIMARY KEY (`adv_id`),
   KEY `campaign_id` (`campaign_id`,`adv_status`,`adv_height`,`adv_width`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;", $maindb);

@@ -1,6 +1,6 @@
 <link rel="stylesheet" type="text/css" href="assets/javascripts/plugins/autocomplete/autoSuggest.css">
 <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
-<script src="assets/javascripts/jquery-1.7.1.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
 <script src="assets/javascripts/plugins/autocomplete/jquery.autoSuggest.js"></script>
 <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
 
@@ -171,8 +171,7 @@ function checkAll(theForm, cName, status) {
 								</div>
 							</div> <!-- .field-group -->
                             
-                            <div class="field-group">
-			
+                                                        <div class="field-group" style="display: <?php global $user_detail; echo isset($user_detail["account_type"]) && $user_detail["account_type"] == 2 ? "none" : "block"; ?>">
 								<div class="field">
 								<select id="campaign_priority" name="campaign_priority">
 								  <?php if (!isset($editdata['campaign_priority'])){$editdata['campaign_priority']='';}  get_priority_dropdown($editdata['campaign_priority']); ?>

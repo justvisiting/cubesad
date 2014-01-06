@@ -21,11 +21,15 @@ exit;
 global $current_action;
 $current_action='edit';
 
+$adData = get_adunit_detail($_GET['id']); 
+
 if (isset($_POST['update'])){
 if (do_edit('adunit', $_POST, $_GET['id'])){
 global $edited;
 $edited=1;
-MAD_Admin_Redirect::redirect('edit_ad_unit.php?edited=1&id='.$_GET['id'].'');	
+//MAD_Admin_Redirect::redirect('edit_ad_unit.php?edited=1&id='.$_GET['id'].'');
+$campaignId = isset( $adData["campaign_id"] ) ? $adData["campaign_id"] : "";
+echo '<META HTTP-EQUIV="Refresh" Content="0; URL=view_adunits.php?id=' . $campaignId .'">';exit;
 }
 else
 {
@@ -36,7 +40,7 @@ $edited=2;
 
 
 if ($edited!=2){
-    $editdata=get_adunit_detail($_GET['id']);
+    $editdata=$adData;
     $editdata['creative_type']=$editdata['adv_type'];
     $editdata['custom_creative_width']=$editdata['adv_width'];
     $editdata['custom_creative_height']=$editdata['adv_height'];
