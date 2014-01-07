@@ -120,7 +120,7 @@
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==14){echo 'selected="selected"'; } ?> value="14">Logo</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==15){echo 'selected="selected"'; } ?> value="15">Multipart Text</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==16){echo 'selected="selected"'; } ?> value="16">Multipart Banner</option>
-                                                <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==17){echo 'selected="selected"'; } ?> value="17">Multipart Interstitial</option>
+                                                <!--<option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==17){echo 'selected="selected"'; } ?> value="17">Multipart Interstitial</option>-->
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==10){echo 'selected="selected"'; } ?> value="10">Custom Size:</option>
                                               </select>
                                             <label for="creative_format">Creative Format</label>
@@ -384,7 +384,7 @@
             if($("#creative_format").val() == "11"){
                 $("#click_url_div_text").show();
                 $("#ad_desc_div").show();
-                $("accordion").hide();
+                $("#accordion").hide();
             }
             if($("#creative_format").val() == 15){
                 $("#ad_desc_div").show();

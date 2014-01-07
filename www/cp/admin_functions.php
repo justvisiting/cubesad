@@ -1650,6 +1650,8 @@ if ($type=='adunit'){
             $data["html_body3"] = "";
             $data["html_body4"] = "";
         }else if($data["creative_type"] == 2){
+            $creative_hash = "";
+            $file_extension = "";
             $data["creative_url2"] = "";
             $data["creative_url3"] = "";
             $data["creative_url4"] = "";
@@ -1662,6 +1664,8 @@ if ($type=='adunit'){
             $data["html_body3"] = "";
             $data["html_body4"] = "";
         }else if($data["creative_type"] == 3){
+            $creative_hash = "";
+            $file_extension = "";
             $data["creative_url"] = "";
             $data["creative_url2"] = "";
             $data["creative_url3"] = "";
@@ -1688,6 +1692,11 @@ if ($type=='adunit'){
     if ($data['creative_format']==4){$data['custom_creative_width']=160; $data['custom_creative_height']=600;}
     if ($data['creative_format']==5){$data['custom_creative_width']=300; $data['custom_creative_height']=50;}
     if ($data['creative_format']==6){$data['custom_creative_width']=320; $data['custom_creative_height']=480;}
+    
+    if($data['creative_format'] >= 11){
+        $data['custom_creative_width']=""; 
+        $data['custom_creative_height']="";
+    }
     
     // IF CREATIVE TYPE =1, ATTEMPT TO UPLOAD CREATIVE
     if ($data['creative_type']==1  && $data['creative_format'] != 11){
@@ -1795,9 +1804,6 @@ if(!isset($data['adv_mraid4'])){$data['adv_mraid4'] = '';}
 
 if(!isset($data["click_url"])){$data["click_url"] = "";}
 
-if($data["creative_format"] == 11){
-    $data["click_url"] = $data["click_url_text"];
-}
     $data['creative_type']=sanitize($data['creative_type']);
     $data['click_url']=sanitize($data['click_url']);
     $data['html_body']=sanitize($data['html_body']);
@@ -2946,6 +2952,10 @@ if ($data['creative_format']==5){$data['custom_creative_width']=300; $data['cust
 if ($data['creative_format']==6){$data['custom_creative_width']=320; $data['custom_creative_height']=480;}
 // End Define Image Sizes
 
+if($data['creative_format'] >= 11){
+    $data['custom_creative_width']="";
+    $data['custom_creative_height']="";
+}
 
 if ($data['creative_type']==1  && $data['creative_format'] != 11){
     if(file_exists($_FILES['creative_file']['tmp_name']) && is_uploaded_file($_FILES['creative_file']['tmp_name']) ){
@@ -3532,6 +3542,10 @@ if ($data['creative_format']==5){$data['custom_creative_width']=300; $data['cust
 if ($data['creative_format']==6){$data['custom_creative_width']=320; $data['custom_creative_height']=480;}
 // End Define Image Sizes
 
+if($data['creative_format'] >= 11){
+    $data['custom_creative_width']="";
+    $data['custom_creative_height']="";
+}
 
 // IF CREATIVE TYPE =1, ATTEMPT TO UPLOAD CREATIVE
 if ($data['creative_type']==1  && $data['creative_format'] != 11){

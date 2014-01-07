@@ -313,9 +313,12 @@ function print_ad(){
 global $display_ad;	
 global $request_settings;
 
-/*if(!generateCustomAdsXML($display_ad["ad_id"],$request_settings)){
-    return;
-}*/
+// this will bypass if ad type is custom ad.
+if(generateCustomAdsXML()){
+    return true;
+}
+
+
 
 if ($display_ad['main_type']=='display'){
 	
@@ -703,7 +706,7 @@ return false;
 }
 
 function get_creative_url($content){
-if ($content['creativeserver_id']==1){
+if ($content['creativeserver_id']==1 || $content['creativeserver_id'] == ''){
 //$image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF'])."".MAD_CREATIVE_DIR."".$content['unit_hash'].".".$content['adv_creative_extension']."";
 $image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/')."".MAD_CREATIVE_DIR."".$content['unit_hash'].".".$content['adv_creative_extension']."";
 }
@@ -1792,13 +1795,15 @@ break;
 
 // edit by raj..
 
-/*function generateCustomAdsXML($adId,$resultType){
+function generateCustomAdsXML(){
     // get the ad creative_format
-    $adUnitDetails = get_adunit_detail($adId);
+    global $display_ad;
+    global $request_settings;
+    global $maindb;
+    $getadunitres=mysql_query("select * from md_ad_units where adv_id='{$display_ad["ad_id"]}'", $maindb);
+    $adUnitDetails=mysql_fetch_array($getadunitres);
     if(isset($adUnitDetails["creative_format"]) && $adUnitDetails["creative_format"] > 10){
-        prepare_ctr();
-        global $display_ad;
-        switch ($resultType['response_type']){
+        switch ($request_settings['response_type']){
             case 'xml':
                 $adType = "";
                 $textNode = "";
@@ -1849,10 +1854,21 @@ break;
                         $htmlString = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml"] . "]]></htmlString>";
                     }
                 }
-                //Multipart Text ad
-                else if($adUnitDetails["creative_format"] == 15){
-                    $textNode = "<text>{$adUnitDetails["ad_description"]}</text>";
-                    $adType = "multiPartTextAd";
+                //Multipart Text ad or Multipart Banner ad or Multipart Interstitial ad
+                else if($adUnitDetails["creative_format"] == 15 || $adUnitDetails["creative_format"] == 16 || $adUnitDetails["creative_format"] == 17){
+                    $smallImg = "";
+                    if($adUnitDetails["creative_format"] == 15){
+                        $textNode = "<text>{$adUnitDetails["ad_description"]}</text>";
+                        $adType = "multiPartTextAd";
+                    }else if($adUnitDetails["creative_format"] == 16){
+                        $adType = "multiPartBannerAd";
+                        $smallImg = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"small_img_url","") . "]]></img>";
+                        $urlType = "<urltype>playStore</urltype>";
+                    }else if($adUnitDetails["creative_format"] == 17){
+                        $adType = "multiPartLogoAd";
+                        $urlType = "<urltype>playStore</urltype>";
+                    }
+                    
                     if(isset($adUnitDetails["unit_hash"]) && strlen($adUnitDetails["unit_hash"]) > 0){
                         $img1 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash","adv_creative_extension") . "]]></img>";
                     }else if(isset($adUnitDetails["adv_bannerurl"]) && strlen($adUnitDetails["adv_bannerurl"]) > 0){
@@ -1863,26 +1879,47 @@ break;
                     // start with here...
                     if(isset($adUnitDetails["unit_hash_2"]) && strlen($adUnitDetails["unit_hash_2"]) > 0){
                         $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
-                    }if(isset($adUnitDetails["unit_hash_3"]) && strlen($adUnitDetails["unit_hash_3"]) > 0){
-                        $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
-                    }if(isset($adUnitDetails["unit_hash_4"]) && strlen($adUnitDetails["unit_hash_4"]) > 0){
-                        $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    }else if(isset($adUnitDetails["banner_url2"]) && strlen($adUnitDetails["banner_url2"]) > 0){
+                        $img2 = "<img><![CDATA[" . $adUnitDetails["banner_url2"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml_2"]) && strlen($adUnitDetails["adv_chtml_2"]) > 0){
+                        $html2 = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml_2"] . "]]></htmlString>";
                     }
                     
-                    $img2 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_2","adv_creative_extension2") . "]]></img>";
-                    $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
-                    $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
-                    $htmlString = "<expand></expand>";
-                    $img = "<expand> <!-- max there will be 4 images -->
-                            $img1
-                            $img2
-                            $img3
-                            $img4
+                    
+                    if(isset($adUnitDetails["unit_hash_3"]) && strlen($adUnitDetails["unit_hash_3"]) > 0){
+                        $img3 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_3","adv_creative_extension3") . "]]></img>";
+                    }else if(isset($adUnitDetails["banner_url3"]) && strlen($adUnitDetails["banner_url3"]) > 0){
+                        $img3 = "<img><![CDATA[" . $adUnitDetails["banner_url2"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml_3"]) && strlen($adUnitDetails["adv_chtml_3"]) > 0){
+                        $html3 = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml_3"] . "]]></htmlString>";
+                    }
+                    
+                    if(isset($adUnitDetails["unit_hash_4"]) && strlen($adUnitDetails["unit_hash_4"]) > 0){
+                        $img4 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash_4","adv_creative_extension4") . "]]></img>";
+                    }else if(isset($adUnitDetails["banner_url4"]) && strlen($adUnitDetails["banner_url4"]) > 0){
+                        $img4 = "<img><![CDATA[" . $adUnitDetails["banner_url4"] . "]]></img>";
+                    }else if(isset($adUnitDetails["adv_chtml_4"]) && strlen($adUnitDetails["adv_chtml_4"]) > 0){
+                        $html4 = "<htmlString skipoverlaybutton='1'><![CDATA[" . $adUnitDetails["adv_chtml_4"] . "]]></htmlString>";
+                    }
+                    if((isset($html1) && strlen($html1) > 0) || (isset($html2) && strlen($html2) > 0) || (isset($html3) && strlen($html3) > 0) || (isset($html3) && strlen($html4) > 0)){
+                        $htmlString = "<expandHtml>$html1
+                            $html2
+                            $html3
+                            $html4</expandHtml>";
+                    }
+                    $img = $smallImg;
+                    if((isset($img1) && strlen($img1) > 0) || (isset($img2) && strlen($img2) > 0) || (isset($img3) && strlen($img3) > 0) || (isset($img4) && strlen($img4) > 0)){
+                        $img .= "<expand> <!-- max there will be 4 images -->
+                                $img1
+                                $img2
+                                $img3
+                                $img4
                             </expand>";
-                     $urlType = "<urltype>call</urltype>";
+                    }
+                    $urlType = "<urltype>call</urltype>";
                 }
                 //Multipart Banner ad
-                else if($adUnitDetails["creative_format"] == 16){
+                /*else if($adUnitDetails["creative_format"] == 16){
                     $adType = "multiPartBannerAd";
                     $smallImg = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"small_img_url","") . "]]></img>";
                     $img1 = "<img><![CDATA[" . getCreativeUrl($adUnitDetails,"unit_hash","adv_creative_extension") . "]]></img>";
@@ -1913,22 +1950,19 @@ break;
                             $img4
                             </expand>";
                     $urlType = "<urltype>playStore</urltype>";
-                }
-                echo <<<EOT
-                <?xml version="1.0" encoding="UTF-8" ?>
-                <request type="$adType">
-                {$htmlString}
-                {$textNode}
-                {$img}
-                {$clickType}
-                {$clickUrl}
-                {$urlType}
-                <clicktype>inapp</clicktype>
-                <refresh>30</refresh>
-                <scale>no</scale>
-                <skippreflight>no</skippreflight>
-                </request>
-EOT;
+                }*/
+echo "<request type='$adType'>
+{$htmlString}
+{$textNode}
+{$img}
+{$clickType}
+{$clickUrl}
+{$urlType}
+<clicktype>inapp</clicktype>
+<refresh>30</refresh>
+<scale>no</scale>
+<skippreflight>no</skippreflight>
+</request>";
                     
             break;
         }
@@ -1938,7 +1972,7 @@ EOT;
 }
 
 function getCreativeUrl($content,$hash,$ext){
-    if ($content['creativeserver_id']==1){
+    if ($content['creativeserver_id']==1 || $content['creativeserver_id']== ''){
         //$image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF'])."".MAD_CREATIVE_DIR."".$content['unit_hash'].".".$content['adv_creative_extension']."";
         $image_url="".MAD_ADSERVING_PROTOCOL . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['PHP_SELF']), '/')."".MAD_CREATIVE_DIR."".$content[$hash].".".$content[$ext]."";
     }else {
@@ -1946,5 +1980,5 @@ function getCreativeUrl($content,$hash,$ext){
         $image_url="".$server_detail['server_default_url']."".$content[$hash].".".$content[$ext].""; 
     }
     return $image_url;
-}*/
+}
 ?>
