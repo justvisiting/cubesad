@@ -147,7 +147,7 @@ function checkAll(theForm, cName, status) {
                                                                         <select <?php if ($current_action=='create'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('create_adunit').style.display='none';} else {document.getElementById('create_adunit').style.display='block';}; callme(this); "<?php } ?> id="campaign_type" name="campaign_type">
                                                                               <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==1){echo 'selected="selected"'; } ?> value="1">Direct Sold</option>
                                                                               <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']==2){echo 'selected="selected"'; } ?> value="2">Promotional</option>
-                                                                              <option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']=='network'){echo 'selected="selected"'; } ?> value="network">Ad Network</option>	  
+                                                                              <!--<option <?php if (isset($editdata['campaign_type']) && $editdata['campaign_type']=='network'){echo 'selected="selected"'; } ?> value="network">Ad Network</option>	  -->
                                                                         </select>
                                                                     <?php } else { ?>
                                                                         <select <?php if ($current_action=='create'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block'; document.getElementById('create_adunit').style.display='none';} else {document.getElementById('network_select').style.display='none'; document.getElementById('create_adunit').style.display='block';}"<?php } ?><?php if ($current_action=='edit'){?>onchange="if (this.options[this.selectedIndex].value=='network'){document.getElementById('network_select').style.display='block';} else {document.getElementById('network_select').style.display='none';}"<?php } ?> id="campaign_type" name="campaign_type">
@@ -379,7 +379,7 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
 								</div>	
                             
                         
-<div class="field-group control-group inline">	
+                                        <div class="field-group control-group inline" style="display:<?php global $user_detail; echo isset($user_detail["user_id"]) && $user_detail["account_type"] == 2 ? "none" : "block"; ?>">	
   
 	
 									<div class="field">

@@ -116,11 +116,11 @@
                                                 <option>- Smartwatch -</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==11){echo 'selected="selected"'; } ?> value="11">Text</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==12){echo 'selected="selected"'; } ?> value="12">Banner</option>
-                                                <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==13){echo 'selected="selected"'; } ?> value="13">Interstitial</option>
+                                                <!--<option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==13){echo 'selected="selected"'; } ?> value="13">Interstitial</option>-->
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==14){echo 'selected="selected"'; } ?> value="14">Logo</option>
+                                                <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==17){echo 'selected="selected"'; } ?> value="17">Interstitial</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==15){echo 'selected="selected"'; } ?> value="15">Multipart Text</option>
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==16){echo 'selected="selected"'; } ?> value="16">Multipart Banner</option>
-                                                <!--<option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==17){echo 'selected="selected"'; } ?> value="17">Multipart Interstitial</option>-->
                                                 <option <?php if (isset($editdata['creative_format']) && $editdata['creative_format']==10){echo 'selected="selected"'; } ?> value="10">Custom Size:</option>
                                               </select>
                                             <label for="creative_format">Creative Format</label>

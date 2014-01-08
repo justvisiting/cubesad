@@ -2297,13 +2297,23 @@ return true;
 			
 if (!isset($data['mobfox_min_cpc_active'])){$data['mobfox_min_cpc_active']='';}
 if (!isset($data['mobfox_backfill_active'])){$data['mobfox_backfill_active']='';}
+if (!isset($data['zone_height'])){$data['zone_height']=''; }
+if (!isset($data['zone_width'])){$data['zone_width']=''; }
 			
-if (!is_numeric($data['zone_refresh']) or empty($data['zone_name']) or ($data['zone_type']=='banner' && (!is_numeric($data['custom_zone_width']) or !is_numeric($data['custom_zone_height']))) or  empty($data['zone_type'])){
+/*if (!is_numeric($data['zone_refresh']) or empty($data['zone_name']) or ($data['zone_type']=='banner' && (!is_numeric($data['custom_zone_width']) or !is_numeric($data['custom_zone_height']))) or  empty($data['zone_type'])){
 global $errormessage;
 $errormessage='Please fill out all required fields.';
 global $editdata;
 $editdata=$data;
 return false;	
+}*/
+
+if (!is_numeric($data['zone_refresh']) or empty($data['zone_name']) or ($data['zone_size']=='10' && (!is_numeric($data['custom_zone_width']) or !is_numeric($data['custom_zone_height']))) or  empty($data['zone_type']) or ($data['zone_type']=='banner' && !is_numeric($data['zone_size']))){
+    global $errormessage;
+    $errormessage='Please fill out all required fields.';
+    global $editdata;
+    $editdata=$data;
+    return false;	
 }
 
 
@@ -2326,10 +2336,16 @@ $editdata=$data;
 return false;	
 }
 
+if ($data['zone_size']==1){$data['zone_width']=320; $data['zone_height']=50;}
+if ($data['zone_size']==2){$data['zone_width']=300; $data['zone_height']=250;}
+if ($data['zone_size']==3){$data['zone_width']=728; $data['zone_height']=90;}
+if ($data['zone_size']==4){$data['zone_width']=160; $data['zone_height']=600;}
+if($data["zone_size"] == 10){$data['zone_width']=$data['custom_zone_width']; $data['zone_height']=$data['custom_zone_height'];}
+
 $data['zone_name']=sanitize($data['zone_name']);
 $data['zone_type']=sanitize($data['zone_type']);
-$data['custom_zone_width']=sanitize($data['custom_zone_width']);
-$data['custom_zone_height']=sanitize($data['custom_zone_height']);
+$data['custom_zone_width']=sanitize($data['zone_width']);
+$data['custom_zone_height']=sanitize($data['zone_height']);
 $data['zone_refresh']=sanitize($data['zone_refresh']);
 $data['zone_channel']=sanitize($data['zone_channel']);
 $data['zone_description']=sanitize($data['zone_description']);
@@ -3888,6 +3904,7 @@ if ($data['zone_size']==1){$data['zone_width']=320; $data['zone_height']=50;}
 if ($data['zone_size']==2){$data['zone_width']=300; $data['zone_height']=250;}
 if ($data['zone_size']==3){$data['zone_width']=728; $data['zone_height']=90;}
 if ($data['zone_size']==4){$data['zone_width']=160; $data['zone_height']=600;}
+if($data["zone_size"] == 10){$data['zone_width']=$data['custom_zone_width']; $data['zone_height']=$data['custom_zone_height'];}
 
 $data['zone_name']=sanitize($data['zone_name']);
 $data['zone_type']=sanitize($data['zone_type']);

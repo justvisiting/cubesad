@@ -91,7 +91,7 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 								</div>	
                                 
                                 <div id="zonesize" class="field-group">
-			                    <?php if ($current_action=='create'){?>
+			                    <?php //if ($current_action=='create'){?>
 								<div class="field">
 									<select onchange="if (this.options[this.selectedIndex].value=='10'){showadiv('widthzonediv'); showadiv('heightzonediv');} else {hideadiv('widthzonediv'); hideadiv('heightzonediv');}" id="zone_size" name="zone_size">
 								  <option>- Phone  -</option>
@@ -102,11 +102,15 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 								  <option value="2">300x250 Medium Tablet Banner</option>
 								  <option value="4">160x600 Skyscraper</option>
 								  <option value="1">320x50 Tablet Banner</option>
+                                                                  <?php global $user_detail; if(isset($user_detail["inv_id"])) { ?>
+                                                                  <option value="5">Google Glass</option>
+								  <option value="6">Sony Smart Watch</option>
+                                                                  <?php } ?>
                                   <option value="10">Custom Size:</option>
 								</select>					
 									<label for="zone_size">Ad Unit Size</label>
 								</div>
-                                <?php } ?>
+                                <?php //} ?>
                                 <div id="widthzonediv" class="field">
 									<input type="text" value="<?php  if (isset($editdata['zone_width'])){ echo $editdata['zone_width']; } ?>" name="custom_zone_width" id="custom_zone_width" size="3" class="" />		x	
 									<label for="last_name">Width</label>
@@ -154,14 +158,21 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 						
 					</div> <!-- .widget -->
                     
-                    <div class="notify">			
+                    <div class="notify" style="display: <?php global $user_detail; echo isset($user_detail["inv_id"]) ? "none" : "block"; ?> ">			
                         <h3>Monetization Settings</h3>			
 						
-						<p><input <?php if (!isset($editdata['mobfox_backfill_active']) or $editdata['mobfox_backfill_active']==1){echo'checked="checked"'; }?> name="mobfox_backfill_active" id="mobfox_backfill_active" type="checkbox" value="1" /><label for="mobfox_backfill_active"><strong>BackFill - </strong>Attempt to show an ad from the MobFox:Connect network before an ad space remains unfilled. (recommended)</label></p><p><input id="mobfox_min_cpc_active" <?php if (isset($editdata['mobfox_min_cpc_active']) && $editdata['mobfox_min_cpc_active']==1){echo'checked="checked"'; }?> name="mobfox_min_cpc_active" type="checkbox" value="1" /><label for="mobfox_min_cpc_active">Only back-fill through MobFox:Connect when the ad pays at least a CPC of $<input type="text" value="<?php if (!empty($editdata['min_cpc'])){ echo $editdata['min_cpc']; } else { echo '0.10'; } ?>"  name="min_cpc" id="min_cpc" size="2" class="" /> (max. $0.20) or a CPM of $<input type="text" value="<?php if (!empty($editdata['min_cpm'])){ echo $editdata['min_cpm']; } else { echo '2.50'; } ?>"  name="min_cpm" id="min_cpm" size="2" class="" /> (max. $5)</label></p>
+						<p><input <?php
+                                                         global  $user_detail;
+                                                         if(isset($user_detail["user_id"]) && $user_detail["account_type"] == 1){
+                                                            if (!isset($editdata['mobfox_backfill_active']) || $editdata['mobfox_backfill_active']==1){
+                                                                echo'checked="checked" '; 
+                                                            }
+                                                        }?>
+                                                        name="mobfox_backfill_active" id="mobfox_backfill_active" type="checkbox" value="1" /><label for="mobfox_backfill_active"><strong>BackFill - </strong>Attempt to show an ad from the MobFox:Connect network before an ad space remains unfilled. (recommended)</label></p><p><input id="mobfox_min_cpc_active" <?php if (isset($editdata['mobfox_min_cpc_active']) && $editdata['mobfox_min_cpc_active']==1){echo'checked="checked"'; }?> name="mobfox_min_cpc_active" type="checkbox" value="1" /><label for="mobfox_min_cpc_active">Only back-fill through MobFox:Connect when the ad pays at least a CPC of $<input type="text" value="<?php if (!empty($editdata['min_cpc'])){ echo $editdata['min_cpc']; } else { echo '0.10'; } ?>"  name="min_cpc" id="min_cpc" size="2" class="" /> (max. $0.20) or a CPM of $<input type="text" value="<?php if (!empty($editdata['min_cpm'])){ echo $editdata['min_cpm']; } else { echo '2.50'; } ?>"  name="min_cpm" id="min_cpm" size="2" class="" /> (max. $5)</label></p>
 					</div> <!-- .notify -->
                     
-                  <div class="notify">			
-    <h3>BackFill Settings - Alternative Networks</h3>			
+<div class="notify" style="display: <?php global $user_detail; echo isset($user_detail["inv_id"]) ? "none" : "block"; ?> ">
+    <h3>BackFill Settings - Alternative Networks</h3>
 						
 						<p><input <?php if (isset ($editdata['backfill_alt_1']) && is_numeric($editdata['backfill_alt_1'])){echo'checked="checked"'; }?> id="backfill_alt_1_active" name="backfill_alt_1_active" type="checkbox" value="1" />
                         <label for="backfill_alt_1_active">

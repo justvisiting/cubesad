@@ -52,7 +52,11 @@
 			
 								<div class="field">
 									<select id="reporting_publication" name="reporting_publication">
+                                                                  <?php global $user_detail;
+                                                                        if(!isset($user_detail["inv_id"])){
+                                                                  ?>
 								  <option value="0">- All Publications  -</option>
+                                                                    <?php } ?>
 <?php if (!isset($editdata['reporting_publication'])){$editdata['reporting_publication']='';} get_publication_dropdown_report($editdata['reporting_publication']); ?>								</select>					
 									<label for="reporting_publication">Publication</label>
 								</div>
