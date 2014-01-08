@@ -10,13 +10,13 @@ header("Pragma: no-cache");
 <!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--><html class="no-js" lang="en"> <!--<![endif]-->
 <?php
+    include_once 'mailer/Email.php';
     $showDefault = '1'; //default publisher;
-    $adminEmail = "abc@gmail.com";
-    $pass = "123";
+    $adminEmail = "nitesh.mali.sspl@gmail.com"; // this mail will be received by admin with publisher/advertiser details.
     if(isset($_POST["send_email_to_publisher"])){
         global $errormessage;
         $name = isset($_POST["pub_fullname"]) && strlen($_POST["pub_fullname"]) > 0 ? $_POST["pub_fullname"] : NULL ;
-        $email = isset($_POST["pub_email_address"]) && strlen($_POST["pub_email_address"]) > 0 ? $_POST["pub_email_address"] : NULL ;
+        $clientEmail = isset($_POST["pub_email_address"]) && strlen($_POST["pub_email_address"]) > 0 ? $_POST["pub_email_address"] : NULL ;
         $phone = isset($_POST["pub_phone_number"]) && strlen($_POST["pub_phone_number"]) > 0 ? $_POST["pub_phone_number"] : NULL ;
         $links = isset($_POST["pub_links"]) && strlen($_POST["pub_links"]) > 0 ? $_POST["pub_links"] : NULL ;
         $comments = isset($_POST["pub_comments"]) && strlen($_POST["pub_comments"]) > 0 ? $_POST["pub_comments"] : NULL ;
@@ -24,7 +24,7 @@ header("Pragma: no-cache");
         if(!isset($name)){
             $errormessage = "Enter Full Name";
             $editdata = $_POST;
-        }else if(!isset($email)){
+        }else if(!isset($clientEmail)){
             $errormessage = "Enter Email Address";
             $editdata = $_POST;
         }else if(!isset($phone)){
@@ -36,14 +36,16 @@ header("Pragma: no-cache");
         }else{
            $body = "Hi Admin,"
                    . "<br/><br/>"
-                   . "Publisher Details are :"
+                   . "Publisher Details are :<br/>"
                    . "Full Name : $name <br/>"
-                   . "Email Address : $email <br/>"
+                   . "Email Address : $clientEmail <br/>"
                    . "Phone Number : $phone <br/>"
                    . "Play store links : $links <br/>"
                    . "Comments : $comments";
-           sendEmail("Invite Publisher",$body,$email,$adminEmail,"Admin",$pass);
-           $confirm = "send";
+           if(Email::sendEmail("Invite Publisher",$body,$adminEmail,$clientEmail,"Madserve")){
+                $confirm = "send";
+                //send email
+           }
         }
     }
     
@@ -51,7 +53,7 @@ header("Pragma: no-cache");
         $showDefault = '2'; //advertiser;
         global $errormessage;
         $name = isset($_POST["adv_fullname"]) && strlen($_POST["adv_fullname"]) > 0 ? $_POST["adv_fullname"] : NULL ;
-        $email = isset($_POST["adv_email_address"]) && strlen($_POST["adv_email_address"]) > 0 ? $_POST["adv_email_address"] : NULL ;
+        $clientEmail = isset($_POST["adv_email_address"]) && strlen($_POST["adv_email_address"]) > 0 ? $_POST["adv_email_address"] : NULL ;
         $phone = isset($_POST["adv_phone_number"]) && strlen($_POST["adv_phone_number"]) > 0 ? $_POST["adv_phone_number"] : NULL ;
         $website = isset($_POST["adv_website"]) && strlen($_POST["adv_website"]) > 0 ? $_POST["adv_website"] : NULL ;
         $comments = isset($_POST["adv_comments"]) && strlen($_POST["adv_comments"]) > 0 ? $_POST["adv_comments"] : NULL ;
@@ -59,7 +61,7 @@ header("Pragma: no-cache");
         if(!isset($name)){
             $errormessage = "Enter Full Name";
             $editdata = $_POST;
-        }else if(!isset($email)){
+        }else if(!isset($clientEmail)){
             $errormessage = "Enter Email Address";
             $editdata = $_POST;
         }else if(!isset($phone)){
@@ -71,42 +73,16 @@ header("Pragma: no-cache");
         }else{
             $body = "Hi Admin,"
                    . "<br/><br/>"
-                   . "Publisher Details are :"
+                   . "Advertiser Details are :<br/>"
                    . "Full Name : $name <br/>"
-                   . "Email Address : $email <br/>"
+                   . "Email Address : $clientEmail <br/>"
                    . "Phone Number : $phone <br/>"
                    . "Website : $website <br/>"
                    . "Comments : $comments";
-            sendEmail("Invite Advertiser",$body,$email,$adminEmail,"Admin",$pass);
-            $confirm = "send";
-            //send email
-        }
-    }
-    function sendEmail($subject,$body,$to,$from,$from_name,$password){
-        require_once("mailer/class.phpmailer.php");
-        $mail = new PHPMailer();
-        $mail->IsSMTP();
-        //$mail->Host       = "localhost"; // SMTP server
-        $mail->SMTPDebug  = 1;                     // enables SMTP debug information (for testing)
-                                                                                   // 1 = errors and messages
-                                                                                   // 2 = messages only
-        $mail->SMTPAuth   = true;                  // enable SMTP authentication
-        //$mail->SMTPSecure = "ssl";
-        $mail->Host       = 'localhost';		// sets the SMTP server
-        $mail->Port       = 25;                    // set the SMTP port for the GMAIL server
-        $mail->Username   = $from; // SMTP account username
-        $mail->Password   = $password;        // SMTP account password	
-        $mail->SetFrom($from,$from_name);
-        $mail->AddAddress($to);
-        $mail->Subject = $subject;
-        $mail->MsgHTML($body);
-        //$mail->IsHTML(true);
-        //$mail->attachments=$attachment;
-        try {
-            $mail->Send();
-        //echo 'thax for subscrption';
-        }catch (Exception $e) {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+            if(Email::sendEmail("Invite Advertiser",$body,$adminEmail,$clientEmail,"Madserve")){
+                $confirm = "send";
+                //send email
+            }
         }
     }
 ?>
