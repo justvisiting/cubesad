@@ -74,10 +74,23 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 									<label for="zone_description">Description</label>
 								</div>
 							</div> <!-- .field-group -->
+							
+							<div id="device-type" class="field-group">
+								<div class="field">
+                                  <select onchange="if (this.options[this.selectedIndex].value=='5' || this.options[this.selectedIndex].value=='4'){showadiv('logobutton'); } else {hideadiv('logobutton'); }" id="zone_size" name="zone_size">
+                                  <option>Select Device Type</option>
+                                  <option value="1">Tablet</option>
+								  <option value="2">LG G watch</option>
+								  <option value="3">Motorola G watch</option>
+								  <option value="4">Google Glass</option>
+								  <option value="5">Sony Smart Watch</option>
+								</select>					
+									<label for="device-type">DeviceType</label>
+						    </div>
                             
                             <div class="field-group control-group inline">	
 			
-									<div class="field">
+									<div id="bannerbutton" class="field">
 										<input type="radio" <?php if (isset($editdata['zone_type']) && $editdata['zone_type']=='banner'){echo'checked="checked"'; }?>  onclick="showadiv('zonesize'); checkdivsreopen();" name="zone_type" id="zone_type_banner" value="banner" />
 										<label for="zone_type_banner">Banner Ad</label>
 									</div>
@@ -85,6 +98,11 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 									<div id="interstitialoptiobutton" class="field">
 										<input type="radio" <?php if (isset($editdata['zone_type']) && $editdata['zone_type']=='interstitial'){echo'checked="checked"'; }?> onclick="hideadiv('zonesize'); checkdivs();" name="zone_type" id="zone_type_interstitial" value="interstitial" />
 										<label for="zone_type_interstitial">Full Page Interstitial</label>
+									</div>
+									
+					                <div id="logobutton" class="field">
+										<input type="radio" <?php if (isset($editdata['zone_type']) && $editdata['zone_type']=='logo'){echo'checked="checked"'; }?> onclick="hideadiv('zonesize'); checkdivs();" name="zone_type" id="zone_type_logo" value="logo" />
+										<label for="zone_type_logo">Logo Ad</label>
 									</div>
 			
 									
@@ -102,10 +120,10 @@ if (document.forms['crudpublication'].elements['zone_size'].value=='10'){showadi
 								  <option value="2">300x250 Medium Tablet Banner</option>
 								  <option value="4">160x600 Skyscraper</option>
 								  <option value="1">320x50 Tablet Banner</option>
-                                                                  <?php global $user_detail; if(isset($user_detail["inv_id"])) { ?>
-                                                                  <option value="5">Google Glass</option>
+                                <?php /*global $user_detail; if(isset($user_detail["inv_id"])) { */ ?>
+                                  <option value="5">Google Glass</option>
 								  <option value="6">Sony Smart Watch</option>
-                                                                  <?php } ?>
+                                <?php/* } */ ?>
                                   <option value="10">Custom Size:</option>
 								</select>					
 									<label for="zone_size">Ad Unit Size</label>

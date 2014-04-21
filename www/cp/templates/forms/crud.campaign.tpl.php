@@ -478,25 +478,39 @@ $("input[id=country_targeting]").autoSuggest(data.items, {selectedItemProp: "nam
                                                         $checked = "checked";
                                                     }
                                                     echo <<<EOT
+                                                    
                                                     <tr>
                                                         <td width='30%'><input $checked type="checkbox" name='device[]' value='{$device['device_id']}'>{$device["device_name"]}</td>
                                                         <td>Min</td>
                                                         <td>
 EOT;
-                                                    /*$check = "";
-                                                    if(in_array($device["device_id"],$sDevices)){
-                                                        $check = "checked";
-                                                    }*/
-                                                        
-                                                   
-                                                      
                                                     $deviceId = $device["device_id"];
+                                                    $versionSql = "SELECT * FROM md_device_versions where device_id = $deviceId";
+                                                    $deviceVersions = mysql_query($versionSql,$maindb);
+                                                    $versions = array();
+                                                    while($deviceVersion = mysql_fetch_array($deviceVersions)){
+                                                    	$versions[] = $deviceVersion["version"];
+                                                    	
+                                                    }
                                                     $str = '<select name="version_min'.$device[device_id].'">
                                                                 <option value="">No Min</option>
-                                                            <option ';
+		
+                                                             ';
+                                                    
+                                                    foreach($versions as $version){
+                                                          $str.='<option ';
+                                                          if( $sDevices[$deviceId]["min"] == $version) {
+                                                          	$str.= "selected" ;
+                                                          }
+                                                          $str.=' value="'.$version.'">'.$version.'</option>';
+                                                    }
+
+                                                    
+                                                    /*
                                                             if( $sDevices[$deviceId]["min"] == "2.0") { 
                                                                 $str.= "selected" ;
-                                                            } 
+                                                            }
+                                                             
                                                     $str.=' value="2.0">2.0</option>';
                                                     $str.='<option ';
                                                     if($sDevices[$deviceId]["min"] == "2.1"){
@@ -543,13 +557,22 @@ EOT;
                                                         $str.= "selected" ;
                                                     }
                                                     $str.=' value="5.0">5.0</option>';
+                                                    */
                                                     $str.='</td>
                                                         <td>Max</td>
                                                         <td>
                                                             <select name="version_max'.$device[device_id].'">
-                                                                <option value="">No Max</option>
-                                                               
- <option ';
+                                                                <option value="">No Max</option>';
+                                                    
+                                                                                        
+                                                    foreach($versions as $version){
+                                                    	$str.='<option ';
+                                                    	if( $sDevices[$deviceId]["max"] == $version) {
+                                                    		$str.= "selected" ;
+                                                    	}
+                                                    	$str.=' value="'.$version.'">'.$version.'</option>';
+                                                    }
+                                                    /*
                                                             if( $sDevices[$deviceId]["max"] == "2.0") { 
                                                                 $str.= "selected" ;
                                                             } 
@@ -599,7 +622,8 @@ EOT;
                                                         $str.= "selected" ;
                                                     }
                                                     $str.=' value="5.0">5.0</option></select>
-                                                        </td>
+                                                    */
+                                              $str.='</td>
                                                     </tr>';
                                                     
                                                     echo $str;

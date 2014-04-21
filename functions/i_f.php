@@ -5182,7 +5182,19 @@ mysql_query("CREATE TABLE IF NOT EXISTS `md_device` "
             . "PRIMARY KEY  (`device_id`)"
         . ")",$maindb);
 mysql_query("INSERT INTO `md_device` (`device_id`,`device_name`) VALUES(NULL,'IPhone'),"
-                                                                . "(NULL,'Android')",$maindb);
+                                                                . "(NULL,'Android'),(NULL,'Google Glass'),(NULL,'Sony Smart Watch'), (NULL,'Motorola GWatch'), (NULL,'LG GWatch')",$maindb);
+
+mysql_query("CREATE TABLE IF NOT EXISTS `md_device_versions` "
+		. "("
+		. "`id` int(11) NOT NULL auto_increment,"
+				. "`device_id` int(11) NOT NULL,"
+			    . "`version` varchar(200) NOT NULL,"
+						. "PRIMARY KEY  (`id`)"
+								. ")",$maindb);
+mysql_query("INSERT INTO `md_device_versions` (`id`,`device_id`,`version`) VALUES(NULL, 1,'iOS1'),(NULL, 1,'iOS2'),(NULL, 1,'iOS3'),(NULL, 1,'iOS4'),(NULL, 1,'iOS5'),(NULL, 1,'iOS6'),(NULL, 1,'iOS7'),"
+										. "(NULL, 2,'Android1'),(NULL, 2,'Android2'),(NULL, 2,'Android3'),(NULL, 2,'Android4'),(NULL, 3,'Google Glass1'),(NULL, 3,'Google Glass2'),(NULL, 3,'Google Glass3'),"
+												. "(NULL, 4,'Sony Smart Watch1'),(NULL, 4,'Sony Smart Watch2'),(NULL, 4,'Sony Smart Watch3'),(NULL, 5,'Motorola GWatch1'),(NULL, 5,'Motorola GWatch2'),(NULL, 6,'LG GWatch1'),(NULL, 6,'LG GWatch2'),",$maindb);
+
 mysql_query("CREATE TABLE IF NOT EXISTS `md_device_targeting` "
         . "("
             . "`id` int(11) NOT NULL auto_increment,"
